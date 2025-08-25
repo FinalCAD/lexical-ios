@@ -12,10 +12,16 @@ public typealias DOMConversionOutputAfter = ([Lexical.Node]) throws -> [Lexical.
 public typealias DOMChildConversion = (Lexical.Node, Lexical.Node?) throws -> Lexical.Node? // arguments: node, parent
 public typealias DOMConversionOutput = (after: DOMConversionOutputAfter?, forChild: DOMChildConversion?, node: [Lexical.Node])
 
+public typealias DOMConversionFn = (SwiftSoup.Node) throws -> DOMConversionOutput
+public typealias DOMConversion = (conversion: DOMConversionFn, priority: Int?)
+public typealias DOMConversionProp = (SwiftSoup.Node) -> DOMConversion
+public typealias DOMConversionMap = [String: DOMConversionFn]
+
 public typealias DOMExportOutputAfter = (Lexical.Node, SwiftSoup.Element?) throws -> SwiftSoup.Element?
 public typealias DOMExportOutput = (after: DOMExportOutputAfter?, element: SwiftSoup.Element?)
 
+
 public protocol NodeHTMLSupport: Lexical.Node {
-  static func importDOM(domNode: SwiftSoup.Node) throws -> DOMConversionOutput
+  static func importDOM() throws -> DOMConversionMap
   func exportDOM(editor: Editor) throws -> DOMExportOutput
 }

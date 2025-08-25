@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 70;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -24,6 +24,7 @@
 		06F7CF942A542E4E0024CD5A /* LexicalInlineImagePlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 06F7CF932A542E4E0024CD5A /* LexicalInlineImagePlugin */; };
 		06F7CF962A545C7C0024CD5A /* lexical-logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 06F7CF952A545C7C0024CD5A /* lexical-logo.png */; };
 		3C48FEE42B04F2C5009BBFA2 /* LexicalMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = 3C48FEE32B04F2C5009BBFA2 /* LexicalMarkdown */; };
+		F9A5776C2E586A1100AB5735 /* HTMLImportPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A5776B2E586A1100AB5735 /* HTMLImportPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,7 +39,12 @@
 		069E59DC2A1F726D00CA4296 /* ExportOutputViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportOutputViewController.swift; sourceTree = "<group>"; };
 		06CB47B329DE0139005AC7BD /* NodeHierarchyViewPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeHierarchyViewPlugin.swift; sourceTree = "<group>"; };
 		06F7CF952A545C7C0024CD5A /* lexical-logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lexical-logo.png"; sourceTree = "<group>"; };
+		F9A5776B2E586A1100AB5735 /* HTMLImportPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLImportPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		F9A5776D2E588A9B00AB5735 /* New Folder */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "New Folder"; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		0656CF7229D1E438009CA08F /* Frameworks */ = {
@@ -81,6 +87,8 @@
 		0656CF7729D1E438009CA08F /* LexicalPlayground */ = {
 			isa = PBXGroup;
 			children = (
+				F9A5776D2E588A9B00AB5735 /* New Folder */,
+				F9A5776B2E586A1100AB5735 /* HTMLImportPlugin.swift */,
 				0656CF7829D1E438009CA08F /* AppDelegate.swift */,
 				0656CF7C29D1E438009CA08F /* ViewController.swift */,
 				069E59DC2A1F726D00CA4296 /* ExportOutputViewController.swift */,
@@ -124,6 +132,9 @@
 			);
 			dependencies = (
 				0656CF9629D2373C009CA08F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F9A5776D2E588A9B00AB5735 /* New Folder */,
 			);
 			name = LexicalPlayground;
 			packageProductDependencies = (
@@ -194,6 +205,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9A5776C2E586A1100AB5735 /* HTMLImportPlugin.swift in Sources */,
 				0656CF7D29D1E438009CA08F /* ViewController.swift in Sources */,
 				0656CF7929D1E438009CA08F /* AppDelegate.swift in Sources */,
 				0656CF9029D1ED8F009CA08F /* ToolbarPlugin.swift in Sources */,
@@ -344,6 +356,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W66RQZY5WR;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LexicalPlayground/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -355,7 +368,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.LexicalPlayground;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finalcad.LexicalPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -370,6 +383,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W66RQZY5WR;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = LexicalPlayground/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -381,7 +395,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.facebook.LexicalPlayground;
+				PRODUCT_BUNDLE_IDENTIFIER = com.finalcad.LexicalPlayground;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -450,9 +464,9 @@
 			productName = LexicalInlineImagePlugin;
 		};
 		3C48FEE32B04F2C5009BBFA2 /* LexicalMarkdown */ = {
- 			isa = XCSwiftPackageProductDependency;
- 			productName = LexicalMarkdown;
- 		};
+			isa = XCSwiftPackageProductDependency;
+			productName = LexicalMarkdown;
+		};
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0656CF6D29D1E438009CA08F /* Project object */;

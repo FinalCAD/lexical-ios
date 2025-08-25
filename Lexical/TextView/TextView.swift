@@ -295,7 +295,7 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
             return
           }
 
-          let markedRangeSelection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+          let markedRangeSelection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
           _ = try markedRangeSelection.getNodes().map { node in
             internallyMarkNodeAsDirty(node: node, cause: .userInitiated)
           }

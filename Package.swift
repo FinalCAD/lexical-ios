@@ -41,7 +41,7 @@ let package = Package(
       targets: ["LexicalMarkdown"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.6.0"),
+    .package(url: "https://github.com/scinfu/SwiftSoup.git", from: "2.10.3"),
     .package(url: "https://github.com/apple/swift-markdown.git", branch: "main"),
   ],
   targets: [

@@ -84,7 +84,7 @@ open class ElementNode: Node {
   }
 
   @discardableResult
-  func setDirection(direction: Direction?) throws -> ElementNode {
+  public func setDirection(direction: Direction?) throws -> ElementNode {
     try errorOnReadOnly()
     let node = try getWritable() as ElementNode
     node.direction = direction
