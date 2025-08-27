@@ -23,14 +23,12 @@ extension LinkNode: NodeHTMLSupport {
         
         let node = LinkNode(url: element.getAttributes()?.get(key: "href") ?? "", key: nil)
         
-//        if element is SwiftSoup.
-        
-        
         return (after: nil, forChild: nil, node: [node])
     }
     
     public func exportDOM(editor: Lexical.Editor) throws -> DOMExportOutput {
-        let dom = SwiftSoup.Element(Tag("br"), "")
+        let dom = SwiftSoup.Element(Tag("a"), "")
+        try dom.attr("href", getLatest().getURL())
         return (after: nil, element: dom)
     }
     

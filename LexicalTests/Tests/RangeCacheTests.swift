@@ -98,7 +98,7 @@ class RangeCacheTests: XCTestCase {
       XCTAssertEqual(newPoint.type, .element)
       XCTAssertEqual(newPoint.offset, 0)
 
-      let selection = RangeSelection(anchor: newPoint, focus: newPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: newPoint, focus: newPoint, format: TextFormat(), style: "")
       try selection.insertText("Test")
 
       if let newTextNode = yetAnotherParagraph.getFirstChild() as? TextNode {

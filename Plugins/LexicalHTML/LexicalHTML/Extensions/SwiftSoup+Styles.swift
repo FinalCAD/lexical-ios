@@ -7,67 +7,53 @@
 
 import SwiftSoup
 
-enum Styles {
-    case paddingInlineStart(Int)
-    case textAlign(TextAlign)
-    
-    var toHTMLString: String {
-        switch self {
-        case .paddingInlineStart(let value):
-            return "padding-inline-start:\(value)px"
-        case .textAlign(let value):
-            return "text-align:\(value)"
-        }
-    }
-}
-
-extension Styles {
+struct NodeStyle {
     enum TextAlign: String {
         case left
         case right
         case center
         case justify
     }
-}
-
-struct NodeStyle {
-    private let attributes: [Styles]
 //    let fontWeight
     
-    init(attributes: [Styles]) {
-        self.attributes = attributes
+    var paddingInlineState: Int?
+    var textAlign: TextAlign?
+    
+    
+    
+    init(paddingInlineState: Int? = nil, textAlign: TextAlign? = nil) {
+        self.paddingInlineState = paddingInlineState
+        self.textAlign = textAlign
     }
     
     init(from string: String) {
         let components = string.split(separator: ";")
         
-        self.attributes = components.compactMap {
-            let temp = $0.split(separator: ":")
-            let key = temp[0].trimmingCharacters(in: .whitespaces)
-            let value = temp[1].trimmingCharacters(in: .whitespaces)
+        components.forEach {
+            let splitted = $0.split(separator: ":")
+            let key = splitted[0].trimmingCharacters(in: .whitespaces)
+            let value = splitted[1].trimmingCharacters(in: .whitespaces)
             
             switch key {
             case "padding-inline-start":
-                return .paddingInlineStart(Int(value) ?? 0)
+                self.paddingInlineState = Int(value)
             case "text-align":
-                guard let textAlign = Styles.TextAlign(rawValue: value) else {
-                    break
-                }
-                return .textAlign(textAlign)
+                self.textAlign = .init(rawValue: value)
             default:
                 break
             }
-            
-            return nil
         }
     }
     
-//    func get<T: Any>(_ key: Styles) -> T {
-//        attributes.first { $0 == key } as? T
-//    }
-    
     var toString: String {
-        attributes.map { $0.toHTMLString }.joined(separator: ";")
+        ([
+            "padding-inline-start": paddingInlineState,
+            "text-align": textAlign
+        ] as [String: Any?])
+        .filter { $1 != nil }
+        .map { "\($0):\($1!)" }
+        .joined(separator: ";")
+        
     }
 }
 

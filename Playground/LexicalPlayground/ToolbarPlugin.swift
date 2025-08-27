@@ -497,7 +497,7 @@ public class ToolbarPlugin: Plugin {
   }
 
   public func showLinkActionSheet(url: String, selection: RangeSelection?) -> Bool {
-    let actionSheet = UIAlertController(title: "Link Action", message: nil, preferredStyle: .actionSheet)
+      let actionSheet = UIAlertController(title: "Link Action", message: nil, preferredStyle: .alert)
 
     let removeLinkAction = UIAlertAction(title: "Remove Link", style: .default) { [weak self] action in
       guard let strongSelf = self else { return }
@@ -517,6 +517,7 @@ public class ToolbarPlugin: Plugin {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let okButton = UIAlertAction(title: "OK", style: .cancel)
         alertController.addAction(okButton)
+          
 
         strongSelf.viewControllerForPresentation?.present(alertController, animated: true)
       }

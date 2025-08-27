@@ -181,6 +181,7 @@ internal func onSelectionChange(editor: Editor) {
       case .text:
         guard let anchorNode = try lexicalSelection.anchor.getNode() as? TextNode else { break }
         lexicalSelection.format = anchorNode.getFormat()
+          lexicalSelection.style = anchorNode.getStyle()
       case .element:
         lexicalSelection.format = TextFormat()
       default:

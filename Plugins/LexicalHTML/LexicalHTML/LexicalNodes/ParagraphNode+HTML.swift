@@ -20,6 +20,9 @@ extension Lexical.ParagraphNode: NodeHTMLSupport {
         let node = Lexical.ParagraphNode()
         
         if let style = element.getAttributes()?.styles() {
+            let indent = (style.paddingInlineState ?? 0) / 40
+            
+            
 //            if let paddingInlineStart = style.paddingInlineStart {
 //                try node.setIndent(paddingInlineStart / 40)
 //            }

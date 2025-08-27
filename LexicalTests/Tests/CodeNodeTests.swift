@@ -54,7 +54,9 @@ class CodeNodeTests: XCTestCase {
       editorState.selection = RangeSelection(
         anchor: Point(key: codeNode.key, offset: 3, type: .element),
         focus: Point(key: codeNode.key, offset: 3, type: .element),
-        format: TextFormat())
+        format: TextFormat(),
+        style: ""
+      )
     }
 
     try editor.update {

@@ -14,7 +14,7 @@ public class RangeSelection: BaseSelection {
     public var focus: Point
     public var dirty: Bool
     public var format: TextFormat
-    public var style: String // TODO: add style support to iOS
+    public var style: String
     
     // MARK: - Init
     
@@ -289,6 +289,7 @@ public class RangeSelection: BaseSelection {
                 nextSibling = TextNode()
                 if let nextSibling {
                     try nextSibling.setFormat(format: format)
+                    try nextSibling.setStyle(style)
                     if !firstNodeParent.canInsertTextAfter() {
                         try firstNodeParent.insertAfter(nodeToInsert: nextSibling)
                     } else {
@@ -1085,9 +1086,11 @@ public class RangeSelection: BaseSelection {
         guard var firstNode = selectedNodes.first, let lastNode = selectedNodes.last else { return }
         
         var firstNextFormat = TextFormat()
+        var firstNextStyle: String = ""
         for node in selectedNodes {
             if let node = node as? TextNode {
                 firstNextFormat = node.getFormatFlags(type: formatType)
+                firstNextStyle = node.getStyle()
                 break
             }
         }
@@ -1105,6 +1108,7 @@ public class RangeSelection: BaseSelection {
                 startOffset = 0
                 firstNode = nextSibling
                 firstNextFormat = nextSibling.getFormat()
+                firstNextStyle = nextSibling.getStyle()
             }
         }
         
@@ -1118,6 +1122,7 @@ public class RangeSelection: BaseSelection {
                         anchor: newSelection.anchor,
                         focus: newSelection.focus,
                         format: firstNextFormat,
+                        style: firstNextStyle,
                         isDirty: newSelection.dirty)
                     return
                 }
@@ -1138,6 +1143,7 @@ public class RangeSelection: BaseSelection {
                         anchor: newSelection.anchor,
                         focus: newSelection.focus,
                         format: firstNextFormat,
+                        style: firstNextStyle,
                         isDirty: newSelection.dirty)
                 } else {
                     // node is partially selected, so split it into two nodes and style the selected one.
@@ -1149,6 +1155,7 @@ public class RangeSelection: BaseSelection {
                         anchor: newSelection.anchor,
                         focus: newSelection.focus,
                         format: firstNextFormat,
+                        style: firstNextStyle,
                         isDirty: newSelection.dirty)
                 }
                 
@@ -1167,6 +1174,7 @@ public class RangeSelection: BaseSelection {
                     startOffset = 0
                 }
                 try textNode.setFormat(format: firstNextFormat)
+                try textNode.setStyle(firstNextStyle)
                 
                 // update selection
                 if isBefore {
@@ -1179,9 +1187,11 @@ public class RangeSelection: BaseSelection {
             }
             
             var lastNextFormat = firstNextFormat
+            var lastNextStyle = firstNextStyle
             
             if var textNode = lastNode as? TextNode {
                 lastNextFormat = textNode.getFormatFlags(type: formatType, alignWithFormat: firstNextFormat)
+                lastNextStyle = textNode.getStyle()
                 // if the offset is 0, it means no actual characters are selected,
                 // so we skip formatting the last node altogether.
                 if endOffset != 0 {
@@ -1194,6 +1204,7 @@ public class RangeSelection: BaseSelection {
                     }
                     
                     try textNode.setFormat(format: lastNextFormat)
+                    try textNode.setStyle(lastNextStyle)
                     // update selection
                     if isBefore {
                         focus.updatePoint(key: textNode.key, offset: endOffset, type: .text)
@@ -1213,7 +1224,9 @@ public class RangeSelection: BaseSelection {
                    selectedNodeKey != lastNode.getKey()
                 {
                     let selectedNextFormat = textNode.getFormatFlags(type: formatType, alignWithFormat: lastNextFormat)
+                    let selectedNextStyle = textNode.getStyle()
                     try textNode.setFormat(format: selectedNextFormat)
+                    try textNode.setStyle(selectedNextStyle)
                 }
             }
         }
@@ -1225,11 +1238,12 @@ public class RangeSelection: BaseSelection {
     
     // MARK: - Private
     
-    private func updateSelection(anchor: Point, focus: Point, format: TextFormat, isDirty: Bool) {
+    private func updateSelection(anchor: Point, focus: Point, format: TextFormat, style: String, isDirty: Bool) {
         self.anchor.updatePoint(key: anchor.key, offset: anchor.offset, type: anchor.type)
         self.focus.updatePoint(key: focus.key, offset: focus.offset, type: focus.type)
         self.format = format
         self.dirty = isDirty
+        self.style = style
     }
     
     private func toggleFormat(type: TextFormatType) {

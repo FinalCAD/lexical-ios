@@ -236,7 +236,12 @@ func createEmptyRangeSelection() -> RangeSelection {
     let anchor = Point(key: kRootNodeKey, offset: 0, type: .element)
     let focus = Point(key: kRootNodeKey, offset: 0, type: .element)
     
-    return RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
+    return RangeSelection(
+        anchor: anchor,
+        focus: focus,
+        format: TextFormat(),
+        style: ""
+    )
 }
 
 /// When we create a selection, we try to use the previous selection where possible, unless an actual user selection change has occurred.
@@ -262,7 +267,12 @@ func createSelection(editor: Editor) throws -> BaseSelection? {
         if let anchor = try pointAtStringLocation(range.location, searchDirection: nativeSelection.affinity, rangeCache: editor.rangeCache),
            let focus = try pointAtStringLocation(range.location + range.length, searchDirection: nativeSelection.affinity, rangeCache: editor.rangeCache)
         {
-            return RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
+            return RangeSelection(
+                anchor: anchor,
+                focus: focus,
+                format: TextFormat(),
+                style: ""
+            )
         }
         
         return nil
@@ -451,7 +461,7 @@ func transferStartingElementPointToTextPoint(start: Point, end: Point, format: T
     guard let element = try start.getNode() as? ElementNode else { return }
     
     var placementNode = element.getChildAtIndex(index: start.offset)
-    let textNode = try createTextNode(text: nil).setFormat(format: format)
+    let textNode = try createTextNode(text: nil).setFormat(format: format).setStyle(style)
     var target: Node
     
     if isRootNode(node: element) {
@@ -462,7 +472,8 @@ func transferStartingElementPointToTextPoint(start: Point, end: Point, format: T
         target = textNode
     }
     
-    _ = try textNode.setFormat(format: format)
+    _ = try textNode.setFormat(format: format).setStyle(style)
+    
     
     if placementNode == nil {
         try element.append([target])

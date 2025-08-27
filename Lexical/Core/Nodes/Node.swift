@@ -162,6 +162,7 @@ open class Node: Codable {
       mutableNode.children = latestNode.children
     } else if let latestNode = latestNode as? TextNode, let mutableNode = mutableNode as? TextNode {
       mutableNode.format = latestNode.format
+        mutableNode.style = latestNode.style
       mutableNode.mode = latestNode.mode
     }
 

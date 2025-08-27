@@ -9,7 +9,13 @@ import SwiftSoup
 import Lexical
 
 public func generateHTMLFromNodes(editor: Editor, selection: BaseSelection?) throws -> String {
-    let container = SwiftSoup.Element(Tag("div"), "")
+    let outputSettings = OutputSettings()
+    
+    outputSettings.prettyPrint(pretty: false)
+    
+    let container = SwiftSoup.Document("div")
+    container.outputSettings(outputSettings)
+    
     guard let root = getRoot() else {
         return ""
     }

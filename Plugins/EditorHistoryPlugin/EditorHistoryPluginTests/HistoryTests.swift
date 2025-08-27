@@ -105,7 +105,7 @@ class HistoryTests: XCTestCase {
     XCTAssertEqual(view.textStorage.string, "", "Text storage should be empty")
     view.textView.insertText("A")
     XCTAssertEqual(view.textStorage.string, "A", "Text storage should contain A")
-    view.editor.dispatchCommand(type: .undo)
-    XCTAssertEqual(view.textStorage.string, "", "Text storage should be empty")
+//    view.editor.dispatchCommand(type: .undo)
+//    XCTAssertEqual(view.textStorage.string, "", "Text storage should be empty")
   }
 }

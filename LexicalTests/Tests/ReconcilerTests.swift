@@ -202,7 +202,9 @@ class ReconcilerTests: XCTestCase {
       editor.testing_getPendingEditorState()?.selection = RangeSelection(
         anchor: Point(key: "2", offset: 0, type: .text),
         focus: Point(key: "2", offset: 0, type: .text),
-        format: TextFormat())
+        format: TextFormat(),
+        style: ""
+      )
 
       try pNode.getFirstChild()?.remove()
     }

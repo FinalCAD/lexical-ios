@@ -12,6 +12,7 @@ extension Lexical.TextNode: NodeHTMLSupport {
     public static func importDOM() throws -> DOMConversionMap {
         [
             "#text": convertTextDOMNode,
+            "b": convertBringAttentionToElement,
             "code": convertTextFormatElement,
             "em": convertTextFormatElement,
             "i": convertTextFormatElement,
@@ -26,39 +27,83 @@ extension Lexical.TextNode: NodeHTMLSupport {
         ]
     }
     
-    private static func convertTextFormatElement(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
-        guard let styles = element.getAttributes()?.styles() else {
-            return (after: nil, forChild: nil, node: [])
-        }
-        
-        return (after: nil, forChild: applyTextFormatFromStyle(styles), node: [])
+    private static func convertBringAttentionToElement(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
+        (
+            after: nil,
+            forChild: applyTextFormatFromStyle(
+                element.getAttributes()?.get(key: "style") ?? "",
+                shouldApply: nil
+            ),
+            node: []
+        )
     }
     
-    private static func convertSpanElement(_ node: SwiftSoup.Node) throws -> DOMConversionOutput {
-        (after: nil, forChild: { lexicalNode, _ in
-            return lexicalNode
-        }, node: [])
+    private static func convertTextFormatElement(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
+        let nodeNameToTextFormat: [String: TextFormatType] = [
+            "code": .code,
+            "em": .italic,
+            "i": .italic,
+//            "mark": .hightlight,
+            "s": .strikethrough,
+            "strong": .bold,
+            "sub": .subScript,
+            "sup": .superScript,
+            "u": .underline
+        ]
+        
+        return (
+            after: nil,
+            forChild: applyTextFormatFromStyle(
+                element.getAttributes()?.get(key: "style") ?? "",
+                shouldApply: nodeNameToTextFormat[element.nodeName()]
+            ),
+            node: []
+        )
+    }
+    
+    private static func convertSpanElement(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
+        (after: nil,
+         forChild: applyTextFormatFromStyle(
+            element.getAttributes()?.get(key: "style") ?? "",
+            shouldApply: nil
+         ),
+         node: []
+        )
     }
     
     private static func convertTextDOMNode(_ node: SwiftSoup.Node) throws -> DOMConversionOutput {
         guard let domNode = node as? SwiftSoup.TextNode else {
             return (after: nil, forChild: nil, node: [])
         }
+        
         let parentDom = node.parent()
         var textContent = domNode.text()
-//        
-//        
+//
+        
+//
 //        let regex = try Regex("/\r/")
 //        textContent = textContent.replace(Regex("\r"), with:" ")
 //        
         return (after: nil, forChild: nil, node: [createTextNode(text: textContent)])
     }
     
-    private static func applyTextFormatFromStyle(_ style: NodeStyle) -> DOMChildConversion {
-//        let fontWeigth = style.fontWeight
+    private static func applyTextFormatFromStyle(_ style: String, shouldApply: TextFormatType?) -> DOMChildConversion {
+//        let fontWeigth = style.
         
         return { node, _ in
-            return node
+            guard let textNode = node as? Lexical.TextNode else {
+                return node
+            }
+            
+            let _ = try textNode.setStyle(style)
+            
+            if shouldApply != nil {
+                var textFormat = textNode.getFormat()
+                textFormat.updateFormat(type: shouldApply!, value: true)
+                try textNode.setFormat(format: textFormat)
+            }
+            
+            return textNode
         }
     }
     
@@ -68,8 +113,12 @@ extension Lexical.TextNode: NodeHTMLSupport {
         var element = SwiftSoup.Element(Tag(outerTag), "")
         
         
-        
+        let style = getLatest().getStyle()
+        if !style.isEmpty {
+            try element.attr("style", style)
+        }
         try element.appendText(self.getTextPart())
+        
         
         if getFormat().bold {
             element = try wrapDomElement(element, with: "b")
