@@ -215,7 +215,7 @@ public class Editor: NSObject {
 
     /// Returns the TextView attached to this Editor.
     /// - Returns: the TextView
-    func getTextView() -> TextView? {
+    public func getTextView() -> TextView? {
         frontend?.getTextView()
     }
 
