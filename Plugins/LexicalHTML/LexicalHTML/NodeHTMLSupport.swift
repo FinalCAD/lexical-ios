@@ -18,7 +18,7 @@ public typealias DOMConversionProp = (SwiftSoup.Node) -> DOMConversion
 public typealias DOMConversionMap = [String: DOMConversionFn]
 
 public typealias DOMExportOutputAfter = (Lexical.Node, SwiftSoup.Element?) throws -> SwiftSoup.Element?
-public typealias DOMExportOutput = (after: DOMExportOutputAfter?, element: SwiftSoup.Element?)
+public typealias DOMExportOutput = (after: DOMExportOutputAfter?, element: SwiftSoup.Node?)
 
 
 public protocol NodeHTMLSupport: Lexical.Node {

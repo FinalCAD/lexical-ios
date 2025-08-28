@@ -108,17 +108,13 @@ extension Lexical.TextNode: NodeHTMLSupport {
     }
     
     public func exportDOM(editor: Lexical.Editor) throws -> DOMExportOutput {
-        let outerTag = getFormat().code ? "code" : "span"
-        
-        var element = SwiftSoup.Element(Tag(outerTag), "")
-        
+        var element: SwiftSoup.Node = SwiftSoup.TextNode(self.getTextPart(), nil)
+        element = try wrapDomElement(element, with: "span")
         
         let style = getLatest().getStyle()
         if !style.isEmpty {
             try element.attr("style", style)
         }
-        try element.appendText(self.getTextPart())
-        
         
         if getFormat().bold {
             element = try wrapDomElement(element, with: "b")
@@ -136,7 +132,7 @@ extension Lexical.TextNode: NodeHTMLSupport {
         return (after: nil, element: element)
     }
     
-    private func wrapDomElement(_ element: SwiftSoup.Element, with tagString: String) throws -> SwiftSoup.Element {
+    private func wrapDomElement(_ element: SwiftSoup.Node, with tagString: String) throws -> SwiftSoup.Element {
         let newElement = SwiftSoup.Element(Tag(tagString), "")
         try newElement.appendChild(element)
         return newElement

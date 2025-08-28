@@ -297,4 +297,8 @@ internal class LexicalReadOnlySizeCache {
     UIGraphicsPopContext()
     context.restoreGState()
   }
+    
+    func getTextView() -> TextView? {
+        nil
+    }
 }
