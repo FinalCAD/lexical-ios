@@ -80,9 +80,10 @@ public enum DirtyType {
   case superScript
 }
 
-enum Direction: String, Codable {
-  case ltr
-  case rtl
+public enum Direction: String, Codable {
+    case left
+    case right
+    case justify
 }
 
 public enum Destination: Codable {

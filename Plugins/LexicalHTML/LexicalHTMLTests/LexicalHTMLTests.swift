@@ -35,11 +35,7 @@ class LexicalHTMLTests: XCTestCase {
     }
 
     let comparison = """
-      <p>
-       <span>
-        hello world
-       </span>
-      </p>
+      <p><span>hello world</span></p>
       """
 
     try editor.update {

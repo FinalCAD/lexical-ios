@@ -1280,8 +1280,8 @@ class NodeTests: XCTestCase {
       let startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       let endPoint = createPoint(key: textNode2.key, offset: 4, type: .text)
       let anotherPoint = createPoint(key: paragraphNode.key, offset: 2, type: .element)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
-      let selection2 = RangeSelection(anchor: anotherPoint, focus: anotherPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
+      let selection2 = RangeSelection(anchor: anotherPoint, focus: anotherPoint, format: TextFormat(), style: "")
 
       XCTAssertTrue(shouldInsertTextAfterOrBeforeTextNode(selection: selection, node: textNode))
       XCTAssertFalse(shouldInsertTextAfterOrBeforeTextNode(selection: selection2, node: textNode2))
@@ -1532,7 +1532,7 @@ class NodeTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       let endPoint = createPoint(key: textNode2.key, offset: 4, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
       editorState.selection = selection
 
       XCTAssertThrowsError(try textNode3.replace(replaceWith: textNode))
@@ -1558,7 +1558,7 @@ class NodeTests: XCTestCase {
       let selection = RangeSelection(
         anchor: Point(key: key, offset: 0, type: .element),
         focus: Point(key: key, offset: 0, type: .element),
-        format: TextFormat())
+        format: TextFormat(), style: "")
       editorState.selection = selection
     }
 
@@ -1625,7 +1625,7 @@ class NodeTests: XCTestCase {
       let selection = RangeSelection(
         anchor: Point(key: key, offset: 0, type: .text),
         focus: Point(key: key, offset: 8, type: .text),
-        format: TextFormat())
+        format: TextFormat(), style: "")
       editorState.selection = selection
     }
 
@@ -1678,7 +1678,7 @@ class NodeTests: XCTestCase {
       let selection = RangeSelection(
         anchor: Point(key: key, offset: 0, type: .text),
         focus: Point(key: key, offset: 4, type: .text),
-        format: TextFormat())
+        format: TextFormat(), style: "")
       editorState.selection = selection
 
       setBlocksType(selection: selection) {
@@ -2176,7 +2176,7 @@ class NodeTests: XCTestCase {
   //
   //      let startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
   //      let endPoint = createPoint(key: textNode.key, offset: 4, type: .text)
-  //      let rangeSelection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+  //      let rangeSelection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
   //      var parserState = NodeParserState()
   //      parserState.originalSelection = rangeSelection
   //      parserState.remappedSelection = rangeSelection
@@ -2214,7 +2214,7 @@ class NodeTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode.key, offset: 1, type: .text)
       let endPoint = createPoint(key: textNode.key, offset: 1, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
       try selection.insertParagraph()
     }
 

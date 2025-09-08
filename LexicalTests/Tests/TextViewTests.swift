@@ -85,7 +85,7 @@ class TextViewTests: XCTestCase {
       let selection = RangeSelection(
         anchor: Point(key: "1", offset: 1, type: .text),
         focus: Point(key: "2", offset: 3, type: .text),
-        format: TextFormat())
+        format: TextFormat(), style: "")
 
       try textView.updateNativeSelection(from: selection)
       XCTAssertEqual(textView.selectedRange.location, 1)
@@ -94,7 +94,7 @@ class TextViewTests: XCTestCase {
       let selection2 = RangeSelection(
         anchor: Point(key: "7", offset: 0, type: .element),
         focus: Point(key: "7", offset: 1, type: .element),
-        format: TextFormat())
+        format: TextFormat(), style: "")
 
       try textView.updateNativeSelection(from: selection2)
       XCTAssertEqual(textView.selectedRange.location, 52)
@@ -116,7 +116,7 @@ class TextViewTests: XCTestCase {
       try paragraphNode.append([textNode])
       let anchor = createPoint(key: "1", offset: 11, type: .text)
       let focus = createPoint(key: "1", offset: 11, type: .text)
-      textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+        textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
     }
 
     textView.selectedRange = NSRange(location: 11, length: 0)
@@ -156,7 +156,7 @@ class TextViewTests: XCTestCase {
   //    textView.insertText("Hello world")
   //    let anchor = createPoint(key: "1", offset: 6, type: .text)
   //    let focus = createPoint(key: "1", offset: 11, type: .text)
-  //    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+  //    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
   //
   //    textView.cut(nil)
   //
@@ -185,7 +185,7 @@ class TextViewTests: XCTestCase {
   //    textView.insertText("Hello world")
   //    let anchor = createPoint(key: "1", offset: 6, type: .text)
   //    let focus = createPoint(key: "1", offset: 11, type: .text)
-  //    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+  //    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
   //
   //    textView.copy(nil)
   //
@@ -213,7 +213,7 @@ class TextViewTests: XCTestCase {
     textView.insertText("Hello world")
     let anchor = createPoint(key: "1", offset: 11, type: .text)
     let focus = createPoint(key: "1", offset: 11, type: .text)
-    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+      textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
 
     guard let selection = textView.editor.getEditorState().selection as? RangeSelection else {
       XCTFail("Need selection")
@@ -243,7 +243,7 @@ class TextViewTests: XCTestCase {
     textView.insertText("Hello world")
     let anchor = createPoint(key: "1", offset: 11, type: .text)
     let focus = createPoint(key: "1", offset: 11, type: .text)
-    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+      textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
 
     guard let selection = textView.editor.getEditorState().selection as? RangeSelection else {
       XCTFail("Need selection")
@@ -276,7 +276,7 @@ class TextViewTests: XCTestCase {
     textView.insertText("Hello world")
     let anchor = createPoint(key: "1", offset: 11, type: .text)
     let focus = createPoint(key: "1", offset: 11, type: .text)
-    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+      textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
 
     guard let selection = textView.editor.getEditorState().selection as? RangeSelection else {
       XCTFail("Need selection")

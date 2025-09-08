@@ -47,6 +47,7 @@ public extension LexicalViewDelegate {
 /// encapsulated our UITextView subclass as a private property of LexicalView. The aim is to consider the UITextView
 /// as below the abstraction level for developers using Lexical.
 @objc public class LexicalView: UIView, Frontend {
+    
   var textLayoutWidth: CGFloat {
     return max(textView.bounds.width - textView.textContainerInset.left - textView.textContainerInset.right - 2 * textView.textContainer.lineFragmentPadding, 0)
   }
@@ -514,4 +515,8 @@ extension LexicalView: LexicalTextViewDelegate {
 
     return true
   }
+    
+    func getTextView() -> TextView? {
+        return textView
+    }
 }

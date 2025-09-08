@@ -9,16 +9,22 @@ import Lexical
 import SwiftSoup
 
 
-
-extension Lexical.CodeNode: NodeHTMLSupport {
+extension Lexical.QuoteNode: NodeHTMLSupport {
     public static func importDOM() throws -> DOMConversionMap {
         [
-            :
+            "blockquote": convertBlockquoteElement
         ]
     }
     
+    private static func convertBlockquoteElement(_ element: SwiftSoup.Node) -> DOMConversionOutput {
+        let node = createQuoteNode()
+        
+        return (after: nil, forChild: nil, node: [node])
+    }
+    
     public func exportDOM(editor: Lexical.Editor) throws -> DOMExportOutput {
-        let dom = SwiftSoup.Element(Tag("code"), "")
+        let dom = SwiftSoup.Element(Tag("blockquote"), "")
         return (after: nil, element: dom)
     }
 }
+

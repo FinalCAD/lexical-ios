@@ -56,7 +56,7 @@ class SelectionTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       let endPoint = createPoint(key: textNode2.key, offset: 4, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       guard let clonedNode = selection.clone() as? RangeSelection else {
         XCTFail("need cloned node")
@@ -84,7 +84,7 @@ class SelectionTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       let endPoint = createPoint(key: textNode2.key, offset: 4, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       selection.setTextNodeRange(
         anchorNode: textNode,
@@ -121,22 +121,22 @@ class SelectionTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       let endPoint = createPoint(key: textNode2.key, offset: 0, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
       XCTAssert(try selection.isBackward() == false)
 
       let startPoint1 = createPoint(key: textNode.key, offset: 1, type: .text)
       let endPoint1 = createPoint(key: paragraphNode.key, offset: 0, type: .element)
-      let selection1 = RangeSelection(anchor: startPoint1, focus: endPoint1, format: TextFormat())
+      let selection1 = RangeSelection(anchor: startPoint1, focus: endPoint1, format: TextFormat(), style: "")
       XCTAssert(try selection1.isBackward() == true)
 
       let startPoint2 = createPoint(key: textNode2.key, offset: 0, type: .text)
       let endPoint2 = createPoint(key: paragraphNode.key, offset: 1, type: .element)
-      let selection2 = RangeSelection(anchor: startPoint2, focus: endPoint2, format: TextFormat())
+      let selection2 = RangeSelection(anchor: startPoint2, focus: endPoint2, format: TextFormat(), style: "")
       XCTAssert(try selection2.isBackward() == false)
 
       let startPoint3 = createPoint(key: textNode2.key, offset: 1, type: .text)
       let endPoint3 = createPoint(key: textNode.key, offset: 1, type: .text)
-      let selection3 = RangeSelection(anchor: startPoint3, focus: endPoint3, format: TextFormat())
+      let selection3 = RangeSelection(anchor: startPoint3, focus: endPoint3, format: TextFormat(), style: "")
       XCTAssert(try selection3.isBackward() == true)
     }
   }
@@ -158,12 +158,12 @@ class SelectionTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       let endPoint = createPoint(key: textNode2.key, offset: 0, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
       XCTAssert(selection.isCollapsed() == false)
 
       let startPoint1 = createPoint(key: textNode.key, offset: 0, type: .text)
       let endPoint1 = createPoint(key: textNode.key, offset: 0, type: .text)
-      let selection1 = RangeSelection(anchor: startPoint1, focus: endPoint1, format: TextFormat())
+      let selection1 = RangeSelection(anchor: startPoint1, focus: endPoint1, format: TextFormat(), style: "")
       XCTAssert(selection1.isCollapsed() == true)
     }
   }
@@ -186,7 +186,7 @@ class SelectionTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode.key, offset: endIndex, type: .text)
       let endPoint = createPoint(key: textNode.key, offset: endIndex, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
       try selection.insertText("Test")
 
       XCTAssertEqual(textNode.getTextPart(), "hello Test")
@@ -241,7 +241,7 @@ class SelectionTests: XCTestCase {
   //
   //      let startPoint = createPoint(key: textNode.key, offset: endIndex, type: .text)
   //      let endPoint = createPoint(key: textNode.key, offset: endIndex, type: .text)
-  //      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+  //      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
   //
   //      textView.setMarkedText("s", selectedRange: NSRange(location: 0, length: 1))
   //      textView.setMarkedText("す", selectedRange: NSRange(location: 0, length: 1))
@@ -278,7 +278,7 @@ class SelectionTests: XCTestCase {
   //
   //      let startPoint = createPoint(key: textNode.key, offset: endIndex, type: .text)
   //      let endPoint = createPoint(key: textNode.key, offset: endIndex, type: .text)
-  //      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+  //      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
   //
   //      try selection.insertText("\n")
   //      try selection.insertText("\n")
@@ -323,7 +323,7 @@ class SelectionTests: XCTestCase {
 
       let startPoint = createPoint(key: paragraphNode.key, offset: 0, type: .text)
       let endPoint = createPoint(key: paragraphNode.key, offset: 0, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
       let selectedNodes = try selection.getNodes()
 
       XCTAssert(selectedNodes.count == 1)
@@ -405,7 +405,7 @@ class SelectionTests: XCTestCase {
 
       var startPoint = createPoint(key: paragraphNode.key, offset: 0, type: .text)
       var endPoint = createPoint(key: paragraphNode.key, offset: 0, type: .text)
-      var selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      var selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
       var extractedNodes = try selection.extract()
 
       XCTAssertEqual(extractedNodes.count, 1, "should have one (empty) paragraph node")
@@ -419,7 +419,7 @@ class SelectionTests: XCTestCase {
 
       startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       endPoint = createPoint(key: textNode3.key, offset: 0, type: .text)
-      selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       extractedNodes = try selection.extract()
 
@@ -451,7 +451,7 @@ class SelectionTests: XCTestCase {
 
       var startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       var endPoint = createPoint(key: textNode.key, offset: 0, type: .text)
-      var selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      var selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
       XCTAssertEqual(paragraphNode.children.count, 2)
 
       try selection.insertParagraph()
@@ -471,7 +471,7 @@ class SelectionTests: XCTestCase {
 
       startPoint = createPoint(key: textNode.key, offset: 6, type: .text) // just before "world"
       endPoint = createPoint(key: textNode.key, offset: 6, type: .text)
-      selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       // inserts a paragraph(key 6)
       try selection.insertParagraph()
@@ -525,7 +525,7 @@ class SelectionTests: XCTestCase {
 
       var startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       var endPoint = createPoint(key: textNode.key, offset: 0, type: .text)
-      var selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      var selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       try selection.insertText("replacement text")
       var nodes = try selection.getNodes()
@@ -540,7 +540,7 @@ class SelectionTests: XCTestCase {
 
       startPoint = createPoint(key: textNode.key, offset: 16, type: .text)
       endPoint = createPoint(key: textNode.key, offset: 16, type: .text)
-      selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       try selection.insertText(" Hello world")
       nodes = try selection.getNodes()
@@ -627,13 +627,13 @@ class SelectionTests: XCTestCase {
 
       var startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       var endPoint = createPoint(key: textNode.key, offset: 0, type: .text)
-      var selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      var selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       try selection.insertText("Hello world")
 
       startPoint = createPoint(key: textNode.key, offset: 0, type: .text)
       endPoint = createPoint(key: textNode.key, offset: 6, type: .text)
-      selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       try selection.insertText("")
       let nodes = try selection.getNodes()
@@ -679,7 +679,7 @@ class SelectionTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode2.key, offset: 3, type: .text)
       let endPoint = createPoint(key: paragraphNode3.key, offset: 0, type: .element)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       try selection.insertText("")
     }
@@ -716,7 +716,7 @@ class SelectionTests: XCTestCase {
   //
   //      let startPoint = createPoint(key: paragraphNode3.key, offset: 0, type: .element)
   //      let endPoint = createPoint(key: paragraphNode3.key, offset: 0, type: .element)
-  //      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+  //      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
   //
   //      try selection.deleteCharacter(isBackwards: true)
   //    }
@@ -759,7 +759,7 @@ class SelectionTests: XCTestCase {
 
       let start = createPoint(key: "1", offset: 5, type: .text)
       let end = createPoint(key: "1", offset: 15, type: .text)
-      selection = RangeSelection(anchor: start, focus: end, format: TextFormat())
+      selection = RangeSelection(anchor: start, focus: end, format: TextFormat(), style: "")
       XCTAssertEqual(selection.format.bold, false)
 
       try selection.formatText(formatType: .bold)
@@ -812,7 +812,7 @@ class SelectionTests: XCTestCase {
       try selection.insertText("This is a new test")
       let start = createPoint(key: "1", offset: 4, type: .text)
       let end = createPoint(key: "3", offset: 7, type: .text)
-      selection = RangeSelection(anchor: start, focus: end, format: TextFormat())
+      selection = RangeSelection(anchor: start, focus: end, format: TextFormat(), style: "")
       XCTAssertEqual(selection.format.bold, false)
 
       try selection.formatText(formatType: .bold)
@@ -921,7 +921,7 @@ class SelectionTests: XCTestCase {
 
       let start = createPoint(key: "1", offset: 5, type: .text)
       let end = createPoint(key: "1", offset: 15, type: .text)
-      selection = RangeSelection(anchor: start, focus: end, format: TextFormat())
+      selection = RangeSelection(anchor: start, focus: end, format: TextFormat(), style: "")
       XCTAssertEqual(selection.format.bold, false)
 
       // make "testing to" to bold
@@ -935,7 +935,7 @@ class SelectionTests: XCTestCase {
 
       let start = createPoint(key: "3", offset: 4, type: .text)
       let end = createPoint(key: "4", offset: 7, type: .text)
-      selection = RangeSelection(anchor: start, focus: end, format: TextFormat())
+      selection = RangeSelection(anchor: start, focus: end, format: TextFormat(), style: "")
       XCTAssertEqual(selection.format.bold, false)
 
       try selection.formatText(formatType: .underline)
@@ -989,7 +989,7 @@ class SelectionTests: XCTestCase {
 
       let start = createPoint(key: "6", offset: 0, type: .text)
       let end = createPoint(key: "4", offset: 7, type: .text)
-      selection = RangeSelection(anchor: start, focus: end, format: TextFormat())
+      selection = RangeSelection(anchor: start, focus: end, format: TextFormat(), style: "")
 
       try selection.formatText(formatType: .bold)
     }
@@ -1047,7 +1047,7 @@ class SelectionTests: XCTestCase {
 
       let anchor = Point(key: "2", offset: 0, type: .text)
       let focus = Point(key: "2", offset: 0, type: .text)
-      let selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+      let selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
       try selection.insertParagraph()
     }
 
@@ -1087,12 +1087,12 @@ class SelectionTests: XCTestCase {
 
       let anchor = Point(key: "1", offset: 12, type: .text)
       let focus = Point(key: "1", offset: 17, type: .text)
-      let selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+      let selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
       try selection.formatText(formatType: .bold) // key 2 with text = again
 
       let newAnchor = Point(key: "1", offset: 6, type: .text)
       let newFocus = Point(key: "1", offset: 6, type: .text)
-      let newSelection = RangeSelection(anchor: newAnchor, focus: newFocus, format: TextFormat())
+      let newSelection = RangeSelection(anchor: newAnchor, focus: newFocus, format: TextFormat(), style: "")
       try newSelection.insertParagraph() // key 4 - paragraph with 2 children
     }
 
@@ -1176,7 +1176,7 @@ class SelectionTests: XCTestCase {
 
       let startPoint = createPoint(key: textNode.key, offset: endIndex, type: .text)
       let endPoint = createPoint(key: textNode.key, offset: endIndex, type: .text)
-      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat())
+      let selection = RangeSelection(anchor: startPoint, focus: endPoint, format: TextFormat(), style: "")
 
       try selection.insertText("Welcome to Lexical iOS")
       XCTAssertEqual(view.textView.text, "Hello!")
@@ -1192,7 +1192,7 @@ class SelectionTests: XCTestCase {
     view.textView.insertText("Hello 🇺🇸, How are you doing?")
     let anchor = Point(key: "1", offset: 5, type: .text)
     let focus = Point(key: "1", offset: 10, type: .text)
-    let selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat())
+    let selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: "")
 
     try editor.read {
       let textContent = try selection.getTextContent()

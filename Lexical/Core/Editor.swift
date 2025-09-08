@@ -213,11 +213,11 @@ public class Editor: NSObject {
     editorState
   }
 
-  //  /// Returns the TextView attached to this Editor.
-  //  /// - Returns: the TextView
-  //  func getTextView() -> TextView? {
-  //    textView
-  //  }
+    /// Returns the TextView attached to this Editor.
+    /// - Returns: the TextView
+    public func getTextView() -> TextView? {
+        frontend?.getTextView()
+    }
 
   // MARK: - Registration
 

@@ -9,16 +9,20 @@ import Lexical
 import SwiftSoup
 
 
-
-extension Lexical.CodeNode: NodeHTMLSupport {
+extension Lexical.LineBreakNode: NodeHTMLSupport {
     public static func importDOM() throws -> DOMConversionMap {
         [
-            :
+            "br": convertLineBreakElement
         ]
     }
     
+    private static func convertLineBreakElement(_ element: SwiftSoup.Node) -> DOMConversionOutput {
+        let node = LineBreakNode()
+        return (after: nil, forChild: nil, node: [node])
+    }
+    
     public func exportDOM(editor: Lexical.Editor) throws -> DOMExportOutput {
-        let dom = SwiftSoup.Element(Tag("code"), "")
+        let dom = SwiftSoup.Element(Tag("br"), "")
         return (after: nil, element: dom)
     }
 }
