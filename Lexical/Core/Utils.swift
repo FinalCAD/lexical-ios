@@ -334,7 +334,7 @@ public func sliceSelectedTextNodeContent(selection: BaseSelection, textNode: Tex
 
     if isAnchor || isFocus {
       let isBackward = try selection.isBackward()
-      let (anchorOffset, focusOffset) = selection.getCharacterOffsets(selection: selection)
+      let (anchorOffset, focusOffset) = selection.getCharacterOffsets()
       let isSame = anchorNode == focusNode
       let isFirst = textNode == (isBackward ? focusNode : anchorNode)
       let isLast = textNode == (isBackward ? anchorNode : focusNode)

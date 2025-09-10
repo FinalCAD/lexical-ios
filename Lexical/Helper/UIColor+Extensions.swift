@@ -1,6 +1,30 @@
 import UIKit
 
 extension UIColor {
+    var coreImageColor: CIColor {
+        return CIColor(color: self)
+    }
+    
+    public var hex: UInt {
+        let red = UInt(coreImageColor.red * 255 + 0.5)
+        let green = UInt(coreImageColor.green * 255 + 0.5)
+        let blue = UInt(coreImageColor.blue * 255 + 0.5)
+        return (red << 16) | (green << 8) | blue
+    }
+    
+    public convenience init(hex: UInt) {
+        let red = (hex >> 16) & 0xFF
+        let green = (hex >> 8) & 0xFF
+        let blue = hex & 0xFF
+        
+        self.init(
+            red: CGFloat(red) / 255.0,
+            green: CGFloat(green) / 255.0,
+            blue: CGFloat(blue) / 255.0,
+            alpha: 1.0
+        )
+    }
+    
     public convenience init?(hex: String) {
         let r, g, b, a: CGFloat
         

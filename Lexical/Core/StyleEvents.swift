@@ -17,3 +17,14 @@ public func updateTextFormat(type: TextFormatType, editor: Editor) throws {
 
   try selection.formatText(formatType: type)
 }
+
+public func patchStyleText(styles: [PartialKeyPath<TextNodeStyle>: Any], editor: Editor) throws {
+    guard getActiveEditor() != nil else {
+        throw LexicalError.invariantViolation("Must have editor")
+    }
+    guard let selection = try getSelection() as? RangeSelection else {
+        return
+    }
+    
+    try selection.apply(styles: styles)
+}

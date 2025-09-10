@@ -257,7 +257,7 @@ internal enum Reconciler {
                 anchor: startPoint,
                 focus: endPoint,
                 format: TextFormat(),
-                style: ""
+                style: TextNodeStyle()
             )
         )
       let attributedSubstring = markedTextAttributedString.attributedSubstring(from: NSRange(location: startPoint.offset, length: length))

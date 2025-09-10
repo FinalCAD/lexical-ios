@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 56;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -41,10 +41,6 @@
 		06F7CF952A545C7C0024CD5A /* lexical-logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lexical-logo.png"; sourceTree = "<group>"; };
 		F9A5776B2E586A1100AB5735 /* HTMLImportPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLImportPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		F9A5776D2E588A9B00AB5735 /* New Folder */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = "New Folder"; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		0656CF7229D1E438009CA08F /* Frameworks */ = {
@@ -87,7 +83,6 @@
 		0656CF7729D1E438009CA08F /* LexicalPlayground */ = {
 			isa = PBXGroup;
 			children = (
-				F9A5776D2E588A9B00AB5735 /* New Folder */,
 				F9A5776B2E586A1100AB5735 /* HTMLImportPlugin.swift */,
 				0656CF7829D1E438009CA08F /* AppDelegate.swift */,
 				0656CF7C29D1E438009CA08F /* ViewController.swift */,
@@ -132,9 +127,6 @@
 			);
 			dependencies = (
 				0656CF9629D2373C009CA08F /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				F9A5776D2E588A9B00AB5735 /* New Folder */,
 			);
 			name = LexicalPlayground;
 			packageProductDependencies = (

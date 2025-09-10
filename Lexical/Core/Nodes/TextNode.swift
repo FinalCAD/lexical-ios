@@ -183,6 +183,63 @@ struct TextNodeDetail: Codable {
     var isUnmergable: Bool = false
 }
 
+public struct TextNodeStyle: Equatable, Codable {
+    public var foregroundColor: UIColor? = nil
+    public var backgroundColor: UIColor? = nil
+    
+    enum CodingKeys: String, CodingKey {
+        case foregroundColor
+        case backgroundColor
+    }
+    
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(foregroundColor?.hex, forKey: .foregroundColor)
+        try container.encode(foregroundColor?.hex, forKey: .backgroundColor)
+    }
+    
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        if let foregroundColor = try container.decodeIfPresent(UInt.self, forKey: .foregroundColor) {
+            self.foregroundColor = UIColor(hex: foregroundColor)
+        }
+        
+        if let backgroundColor = try container.decodeIfPresent(UInt.self, forKey: .backgroundColor) {
+            self.backgroundColor = UIColor(hex: backgroundColor)
+        }
+    }
+    
+    public init(_ patch: [PartialKeyPath<TextNodeStyle>: Any]? = nil) {
+        if let patch {
+            self.patch(patch)
+        }
+    }
+    
+    func patch(_ attributed: inout [NSAttributedString.Key : Any]) {
+        if let foregroundColor {
+            attributed[.foregroundColor] = foregroundColor
+        }
+        
+        if let backgroundColor {
+            attributed[.backgroundColor] = backgroundColor
+        }
+    }
+    
+    mutating func patch(_ patch: [PartialKeyPath<TextNodeStyle>: Any]) {
+        patch.forEach {
+            switch $0 {
+            case \.foregroundColor:
+                self.foregroundColor = $1 as? UIColor
+            case \.backgroundColor:
+                self.backgroundColor = $1 as? UIColor
+            default:
+                break
+            }
+        }
+    }
+}
+
 open class TextNode: Node {
     enum CodingKeys: String, CodingKey {
         case text
@@ -196,7 +253,7 @@ open class TextNode: Node {
     public var mode: Mode = .normal
     var format: TextFormat = TextFormat()
     var detail = TextNodeDetail()
-    var style: String = ""
+    var style = TextNodeStyle()
     
     override public init() {
         super.init()
@@ -225,7 +282,7 @@ open class TextNode: Node {
         self.format = SerializedTextFormat.convertToTextFormat(from: serializedFormat)
         let serializedDetail = try container.decode(SerializedTextNodeDetail.self, forKey: .detail)
         self.detail = SerializedTextNodeDetail.convertToTextDetail(from: serializedDetail)
-        self.style = try container.decode(String.self, forKey: .style)
+        self.style = try container.decode(TextNodeStyle.self, forKey: .style)
     }
     
     override open func encode(to encoder: Encoder) throws {
@@ -235,7 +292,7 @@ open class TextNode: Node {
         try container.encode(self.mode, forKey: .mode)
         try container.encode(SerializedTextFormat.convertToSerializedTextFormat(from: self.format).rawValue, forKey: .format)
         try container.encode(SerializedTextNodeDetail.convertToSerializedTextNodeDetail(from: self.detail).rawValue, forKey: .detail)
-        try container.encode(self.style, forKey: .style)
+        try container.encode(style, forKey: .style)
     }
     
     override public func getTextPart() -> String {
@@ -285,27 +342,7 @@ open class TextNode: Node {
             format = TextFormat()
         }
         
-        let splitted = style.split(separator: ";").reduce(into: [String: String]()) {
-            let temp = $1.split(separator: ":")
-            
-            if temp.first != nil {
-                let key = String(temp.first!)
-                $0[key] = String(temp.last!)
-            }
-        }
-        
-        
-        
-        splitted.forEach { (key, value) in
-            switch key {
-            case "background-color":
-                attributeDictionary[.backgroundColor] = UIColor(rgb: value)
-            case "color":
-                attributeDictionary[.foregroundColor] = UIColor(rgb: value)
-            default:
-                break
-            }
-        }
+        style.patch(&attributeDictionary)
         
         if format.bold {
             attributeDictionary[.bold] = true
@@ -430,14 +467,22 @@ open class TextNode: Node {
         return node
     }
     
-    public func getStyle() -> String {
+    public func getStyle() -> TextNodeStyle {
         let node = getLatest() as TextNode
         return node.style
     }
     
-    public func setStyle(_ style: String) throws -> TextNode {
+    @discardableResult
+    public func setStyle(_ style: TextNodeStyle) throws -> TextNode {
         let writable = try getWritable()
         writable.style = style
+        return writable
+    }
+    
+    @discardableResult
+    public func applyPatch(_ style: [PartialKeyPath<TextNodeStyle>: Any]) throws -> TextNode {
+        let writable = try getWritable()
+        writable.style.patch(style)
         return writable
     }
     

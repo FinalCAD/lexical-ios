@@ -14,11 +14,11 @@ public class RangeSelection: BaseSelection {
     public var focus: Point
     public var dirty: Bool
     public var format: TextFormat
-    public var style: String
+    public var style: TextNodeStyle
     
     // MARK: - Init
     
-    public init(anchor: Point, focus: Point, format: TextFormat, style: String) {
+    public init(anchor: Point, focus: Point, format: TextFormat, style: TextNodeStyle) {
         self.anchor = anchor
         self.focus = focus
         self.dirty = false
@@ -43,9 +43,7 @@ public class RangeSelection: BaseSelection {
         return format.isTypeSet(type: type)
     }
     
-    public func getCharacterOffsets(selection: RangeSelection) -> (Int, Int) {
-        let anchor = selection.anchor
-        let focus = selection.focus
+    public func getCharacterOffsets() -> (Int, Int) {
         if anchor.type == .element && focus.type == .element && anchor.key == focus.key && anchor.offset == focus.offset {
             return (0, 0)
         }
@@ -311,6 +309,7 @@ public class RangeSelection: BaseSelection {
                 prevSibling = TextNode()
                 if let prevSibling {
                     try prevSibling.setFormat(format: format)
+                    try prevSibling.setStyle(style)
                     if !firstNodeParent.canInsertTextBefore() {
                         try firstNodeParent.insertBefore(nodeToInsert: prevSibling)
                     } else {
@@ -329,6 +328,7 @@ public class RangeSelection: BaseSelection {
         } else if firstNode.isSegmented() && startOffset != firstNodeTextLength {
             let textNode = TextNode(text: firstNode.getTextPart())
             try textNode.setFormat(format: format)
+            try textNode.setStyle(style)
             try firstNode.replace(replaceWith: textNode)
             firstNode = textNode
         } else if !isCollapsed() && text.lengthAsNSString() > 0 {
@@ -1073,7 +1073,7 @@ public class RangeSelection: BaseSelection {
         self.focus = focus
         self.dirty = false
         self.format = TextFormat()
-        self.style = ""
+        self.style = TextNodeStyle()
     }
     
     internal func formatText(formatType: TextFormatType) throws {
@@ -1086,7 +1086,7 @@ public class RangeSelection: BaseSelection {
         guard var firstNode = selectedNodes.first, let lastNode = selectedNodes.last else { return }
         
         var firstNextFormat = TextFormat()
-        var firstNextStyle: String = ""
+        var firstNextStyle = TextNodeStyle()
         for node in selectedNodes {
             if let node = node as? TextNode {
                 firstNextFormat = node.getFormatFlags(type: formatType)
@@ -1117,6 +1117,7 @@ public class RangeSelection: BaseSelection {
             if let textNode = firstNode as? TextNode {
                 if anchor.type == .element && focus.type == .element {
                     try textNode.setFormat(format: firstNextFormat)
+                    try textNode.setStyle(firstNextStyle)
                     let newSelection = try textNode.select(anchorOffset: startOffset, focusOffset: endOffset)
                     updateSelection(
                         anchor: newSelection.anchor,
@@ -1138,6 +1139,7 @@ public class RangeSelection: BaseSelection {
                 // The entire node is selected, so just format it
                 if startOffset == 0 && endOffset == textNode.getTextPartSize() {
                     try textNode.setFormat(format: firstNextFormat)
+                    try textNode.setStyle(firstNextStyle)
                     let newSelection = try textNode.select(anchorOffset: startOffset, focusOffset: endOffset)
                     updateSelection(
                         anchor: newSelection.anchor,
@@ -1150,6 +1152,7 @@ public class RangeSelection: BaseSelection {
                     let splitNodes = try textNode.splitText(splitOffsets: [startOffset, endOffset])
                     let replacement = startOffset == 0 ? splitNodes[0] : splitNodes[1]
                     try replacement.setFormat(format: firstNextFormat)
+                    try replacement.setStyle(firstNextStyle)
                     let newSelection = try replacement.select(anchorOffset: 0, focusOffset: endOffset - startOffset)
                     updateSelection(
                         anchor: newSelection.anchor,
@@ -1207,6 +1210,7 @@ public class RangeSelection: BaseSelection {
                     try textNode.setStyle(lastNextStyle)
                     // update selection
                     if isBefore {
+                        
                         focus.updatePoint(key: textNode.key, offset: endOffset, type: .text)
                     } else {
                         anchor.updatePoint(key: textNode.key, offset: endOffset, type: .text)
@@ -1236,9 +1240,172 @@ public class RangeSelection: BaseSelection {
         format = TextFormat()
     }
     
+    internal func apply(styles: [PartialKeyPath<TextNodeStyle>: Any]) throws {
+        if isCollapsed() {
+            style.patch(styles)
+            
+            dirty = true
+            return
+        }
+        
+        let selectedNodes = try getNodes()
+        guard var firstNode = selectedNodes.first, let lastNode = selectedNodes.last else { return }
+        
+        var firstNextFormat = TextFormat()
+        var firstNextStyle = TextNodeStyle()
+        
+        for node in selectedNodes {
+            if let node = node as? TextNode {
+                firstNextFormat = node.getFormat()
+                firstNextStyle = node.getStyle()
+                break
+            }
+        }
+        
+        let isBefore = try anchor.isBefore(point: focus)
+        var startOffset = isBefore ? anchor.offset : focus.offset
+        var endOffset = isBefore ? focus.offset : anchor.offset
+        
+        // This is the case where the user only selected the very end of the
+        // first node so we don't want to include it in the formatting change.
+        if startOffset == firstNode.getTextPartSize() {
+            if let nextSibling = firstNode.getNextSibling() as? TextNode {
+                // we basically make the second node the firstNode, changing offsets accordingly
+                anchor.offset = 0
+                startOffset = 0
+                firstNode = nextSibling
+                firstNextFormat = nextSibling.getFormat()
+                firstNextStyle = nextSibling.getStyle()
+            }
+        }
+        
+        if firstNode === lastNode {
+            if let textNode = firstNode as? TextNode {
+                if anchor.type == .element && focus.type == .element {
+                    try textNode.setFormat(format: firstNextFormat)
+                    try textNode.applyPatch(styles)
+                    let newSelection = try textNode.select(anchorOffset: startOffset, focusOffset: endOffset)
+                    updateSelection(
+                        anchor: newSelection.anchor,
+                        focus: newSelection.focus,
+                        format: firstNextFormat,
+                        style: firstNextStyle,
+                        isDirty: newSelection.dirty)
+                    return
+                }
+                
+                startOffset = anchor.offset > focus.offset ? focus.offset : anchor.offset
+                endOffset = anchor.offset > focus.offset ? anchor.offset : focus.offset
+                
+                // No actual text is selected, so do nothing.
+                if startOffset == endOffset {
+                    return
+                }
+                
+                // The entire node is selected, so just format it
+                if startOffset == 0 && endOffset == textNode.getTextPartSize() {
+                    try textNode.setFormat(format: firstNextFormat)
+                    try textNode.applyPatch(styles)
+                    let newSelection = try textNode.select(anchorOffset: startOffset, focusOffset: endOffset)
+                    updateSelection(
+                        anchor: newSelection.anchor,
+                        focus: newSelection.focus,
+                        format: firstNextFormat,
+                        style: firstNextStyle,
+                        isDirty: newSelection.dirty)
+                } else {
+                    // node is partially selected, so split it into two nodes and style the selected one.
+                    let splitNodes = try textNode.splitText(splitOffsets: [startOffset, endOffset])
+                    let replacement = startOffset == 0 ? splitNodes[0] : splitNodes[1]
+                    try replacement.setFormat(format: firstNextFormat)
+                    try replacement.applyPatch(styles)
+                    let newSelection = try replacement.select(anchorOffset: 0, focusOffset: endOffset - startOffset)
+                    updateSelection(
+                        anchor: newSelection.anchor,
+                        focus: newSelection.focus,
+                        format: firstNextFormat,
+                        style: firstNextStyle,
+                        isDirty: newSelection.dirty)
+                }
+                
+                format = firstNextFormat
+            }
+        } else {
+            // multiple nodes selected
+            if var textNode = firstNode as? TextNode {
+                if startOffset != 0 {
+                    // the entire first node isn't selected, so split it
+                    let splitNodes = try textNode.splitText(splitOffsets: [startOffset])
+                    if splitNodes.count > 1 {
+                        textNode = splitNodes[1]
+                    }
+                    
+                    startOffset = 0
+                }
+                try textNode.setFormat(format: firstNextFormat)
+                try textNode.applyPatch(styles)
+                
+                // update selection
+                if isBefore {
+                    anchor.updatePoint(key: textNode.key, offset: startOffset, type: .text)
+                } else {
+                    focus.updatePoint(key: textNode.key, offset: startOffset, type: .text)
+                }
+                
+                format = firstNextFormat
+            }
+            
+            var lastNextFormat = firstNextFormat
+            var lastNextStyle = firstNextStyle
+            
+            if var textNode = lastNode as? TextNode {
+                lastNextFormat = textNode.getFormat()
+                lastNextStyle = textNode.getStyle()
+                // if the offset is 0, it means no actual characters are selected,
+                // so we skip formatting the last node altogether.
+                if endOffset != 0 {
+                    // if the entire last node isn't selected, split it
+                    if endOffset != textNode.getTextPartSize() {
+                        let lastNodes = try textNode.splitText(splitOffsets: [endOffset])
+                        if lastNodes.count >= 1 {
+                            textNode = lastNodes[0]
+                        }
+                    }
+                    
+                    try textNode.setFormat(format: lastNextFormat)
+                    try textNode.applyPatch(styles)
+                    // update selection
+                    if isBefore {
+                        focus.updatePoint(key: textNode.key, offset: endOffset, type: .text)
+                    } else {
+                        anchor.updatePoint(key: textNode.key, offset: endOffset, type: .text)
+                    }
+                }
+            }
+            
+            // deal with all the nodes in between
+            for index in 1..<selectedNodes.count - 1 {
+                let selectedNode = selectedNodes[index]
+                let selectedNodeKey = selectedNode.getKey()
+                
+                if let textNode = selectedNode as? TextNode,
+                   selectedNodeKey != firstNode.getKey(),
+                   selectedNodeKey != lastNode.getKey()
+                {
+                    let selectedNextFormat = textNode.getFormat()
+                    let selectedNextStyle = textNode.getStyle()
+                    try textNode.setFormat(format: selectedNextFormat)
+                    try textNode.applyPatch(styles)
+                }
+            }
+        }
+    }
+    
+    
+    
     // MARK: - Private
     
-    private func updateSelection(anchor: Point, focus: Point, format: TextFormat, style: String, isDirty: Bool) {
+    private func updateSelection(anchor: Point, focus: Point, format: TextFormat, style: TextNodeStyle, isDirty: Bool) {
         self.anchor.updatePoint(key: anchor.key, offset: anchor.offset, type: anchor.type)
         self.focus.updatePoint(key: focus.key, offset: focus.offset, type: focus.type)
         self.format = format

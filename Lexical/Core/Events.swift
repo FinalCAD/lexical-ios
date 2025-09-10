@@ -184,6 +184,7 @@ internal func onSelectionChange(editor: Editor) {
           lexicalSelection.style = anchorNode.getStyle()
       case .element:
         lexicalSelection.format = TextFormat()
+          lexicalSelection.style = TextNodeStyle()
       default:
         break
       }

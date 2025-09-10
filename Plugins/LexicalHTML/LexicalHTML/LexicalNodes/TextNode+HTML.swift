@@ -7,6 +7,51 @@
 
 import Lexical
 import SwiftSoup
+import UIKit
+
+extension Lexical.TextNodeStyle {
+    static func convertFromCSS(_ style: String) -> Lexical.TextNodeStyle {
+        let splitted: [PartialKeyPath<TextNodeStyle>: Any] = style
+            .split(separator: ";")
+            .reduce(into: [:]) {
+                let temp = $1.split(separator: ":")
+                
+                if temp.first != nil {
+                    let key = String(temp.first!)
+                    let value = String(temp.last!)
+                    
+                    switch key {
+                    case "background-color":
+                        $0[\TextNodeStyle.backgroundColor] = UIColor(rgb: value)
+                    case "color":
+                        $0[\TextNodeStyle.foregroundColor] = UIColor(rgb: value)
+                    default:
+                        break
+                    }
+                }
+            }
+        
+        return TextNodeStyle(splitted)
+    }
+    
+    func toCSS() -> String? {
+        var properties : [String:String] = [:]
+        
+        if let backgroundColor {
+            properties["background-color"] = String(format: "#%06X", backgroundColor.hex)
+        }
+        
+        if let foregroundColor {
+            properties["color"] = String(format: "#%06X", foregroundColor.hex)
+        }
+        
+        if properties.isEmpty {
+            return nil
+        }
+        
+        return properties.map { "\($0):\($1)" }.joined(separator: ";")
+    }
+}
 
 extension Lexical.TextNode: NodeHTMLSupport {
     public static func importDOM() throws -> DOMConversionMap {
@@ -31,7 +76,9 @@ extension Lexical.TextNode: NodeHTMLSupport {
         (
             after: nil,
             forChild: applyTextFormatFromStyle(
-                element.getAttributes()?.get(key: "style") ?? "",
+                TextNodeStyle.convertFromCSS(
+                    element.getAttributes()?.get(key: "style") ?? ""
+                ),
                 shouldApply: nil
             ),
             node: []
@@ -54,7 +101,9 @@ extension Lexical.TextNode: NodeHTMLSupport {
         return (
             after: nil,
             forChild: applyTextFormatFromStyle(
-                element.getAttributes()?.get(key: "style") ?? "",
+                TextNodeStyle.convertFromCSS(
+                    element.getAttributes()?.get(key: "style") ?? ""
+                ),
                 shouldApply: nodeNameToTextFormat[element.nodeName()]
             ),
             node: []
@@ -64,7 +113,9 @@ extension Lexical.TextNode: NodeHTMLSupport {
     private static func convertSpanElement(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
         (after: nil,
          forChild: applyTextFormatFromStyle(
-            element.getAttributes()?.get(key: "style") ?? "",
+            TextNodeStyle.convertFromCSS(
+                element.getAttributes()?.get(key: "style") ?? ""
+            ),
             shouldApply: nil
          ),
          node: []
@@ -87,7 +138,7 @@ extension Lexical.TextNode: NodeHTMLSupport {
         return (after: nil, forChild: nil, node: [createTextNode(text: textContent)])
     }
     
-    private static func applyTextFormatFromStyle(_ style: String, shouldApply: TextFormatType?) -> DOMChildConversion {
+    private static func applyTextFormatFromStyle(_ style: TextNodeStyle, shouldApply: TextFormatType?) -> DOMChildConversion {
 //        let fontWeigth = style.
         
         return { node, _ in
@@ -112,8 +163,8 @@ extension Lexical.TextNode: NodeHTMLSupport {
         element = try wrapDomElement(element, with: "span")
         
         let style = getLatest().getStyle()
-        if !style.isEmpty {
-            try element.attr("style", style)
+        if let css = style.toCSS() {
+            try element.attr("style", css)
         }
         
         if getFormat().bold {

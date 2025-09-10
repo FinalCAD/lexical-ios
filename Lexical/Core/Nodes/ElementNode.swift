@@ -19,6 +19,7 @@ open class ElementNode: Node {
   var children: [NodeKey] = []
   var direction: Direction?
   var indent: Int = 0
+    var textStyle: String = ""
 
   func getDirection() -> Direction? {
     return direction
@@ -375,6 +376,10 @@ open class ElementNode: Node {
 
     return textContent
   }
+    
+    public func getTextStyle() -> String {
+        getLatest().textStyle
+    }
 
   // MARK: - Mutators
   @discardableResult

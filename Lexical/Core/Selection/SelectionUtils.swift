@@ -240,7 +240,7 @@ func createEmptyRangeSelection() -> RangeSelection {
         anchor: anchor,
         focus: focus,
         format: TextFormat(),
-        style: ""
+        style: TextNodeStyle()
     )
 }
 
@@ -271,7 +271,7 @@ func createSelection(editor: Editor) throws -> BaseSelection? {
                 anchor: anchor,
                 focus: focus,
                 format: TextFormat(),
-                style: ""
+                style: TextNodeStyle()
             )
         }
         
@@ -300,7 +300,7 @@ func makeRangeSelection(
         anchor: Point(key: anchorKey, offset: anchorOffset, type: anchorType),
         focus: Point(key: focusKey, offset: focusOffset, type: focusType),
         format: TextFormat(),
-        style: ""
+        style: TextNodeStyle()
     )
     
     selection.dirty = true
@@ -457,7 +457,7 @@ func moveSelectionPointToEnd(point: Point, node: Node) {
     }
 }
 
-func transferStartingElementPointToTextPoint(start: Point, end: Point, format: TextFormat, style: String) throws {
+func transferStartingElementPointToTextPoint(start: Point, end: Point, format: TextFormat, style: TextNodeStyle) throws {
     guard let element = try start.getNode() as? ElementNode else { return }
     
     var placementNode = element.getChildAtIndex(index: start.offset)

@@ -137,7 +137,7 @@ public class NodeSelection: BaseSelection {
             anchor: anchor,
             focus: focus,
             format: TextFormat(),
-            style: ""
+            style: TextNodeStyle()
         )
     }
 }
