@@ -159,6 +159,7 @@ open class Node: Codable {
 
     mutableNode.parent = latestNode.parent
     if let latestNode = latestNode as? ElementNode, let mutableNode = mutableNode as? ElementNode {
+        mutableNode.format = latestNode.format
       mutableNode.children = latestNode.children
     } else if let latestNode = latestNode as? TextNode, let mutableNode = mutableNode as? TextNode {
       mutableNode.format = latestNode.format

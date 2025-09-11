@@ -34,8 +34,8 @@ private func isSelectingEmptyListItem(
  * @param start - Where an ordered list starts its count, start = 1 if left undefined.
  * @returns The new ListNode
  */
-public func createListNode(listType: ListType, start: Int = 1) -> ListNode {
-  return ListNode(listType: listType, start: start)
+public func createListNode(listType: ListType, start: Int = 1) throws -> ListNode {
+  return try applyNodeReplacement(node: ListNode(listType: listType, start: start))
 }
 
 private func createListOrMerge(node: ElementNode, listType: ListType) throws -> ListNode {
@@ -46,7 +46,7 @@ private func createListOrMerge(node: ElementNode, listType: ListType) throws -> 
   let previousSibling = node.getPreviousSibling()
   let nextSibling = node.getNextSibling()
   let listItem = ListItemNode()
-  //  listItem.setFormat(node.getFormatType());
+  try listItem.setFormat(node.getFormat())
   try listItem.setIndent(node.getIndent())
   try listItem.append(node.getChildren())
 
@@ -68,7 +68,7 @@ private func createListOrMerge(node: ElementNode, listType: ListType) throws -> 
     try node.remove()
     return nextSibling
   } else {
-    let list = createListNode(listType: listType)
+    let list = try createListNode(listType: listType)
     try list.append([listItem])
     try node.replace(replaceWith: list)
     try updateChildrenListItemValue(list: list, children: nil)
@@ -146,13 +146,13 @@ public func insertList(editor: Editor, listType: ListType) throws {
     let anchorNodeParent = anchorNode.getParent()
 
     if isSelectingEmptyListItem(anchorNode: anchorNode, nodes: nodes) {
-      let list = createListNode(listType: listType)
+      let list = try createListNode(listType: listType)
 
       if isRootNode(node: anchorNodeParent) {
         try anchorNode.replace(replaceWith: list)
         let listItem = ListItemNode()
         if let anchorNode = anchorNode as? ElementNode {
-          //          listItem.setFormat(anchorNode.getFormatType())
+          try listItem.setFormat(anchorNode.getFormat())
           try listItem.setIndent(anchorNode.getIndent())
         }
         try list.append([listItem])
@@ -181,7 +181,7 @@ public func insertList(editor: Editor, listType: ListType) throws {
 
             if let parent = parentIterator as? ListNode {
               if !handled.contains(parentKey) {
-                let newListNode = createListNode(listType: listType)
+                let newListNode = try createListNode(listType: listType)
                 try newListNode.append(parent.getChildren())
                 try parent.replace(replaceWith: newListNode)
                 try updateChildrenListItemValue(list: newListNode, children: nil)
@@ -308,7 +308,7 @@ internal func handleIndent(_ listItemNode: ListItemNode) throws {
 
     if let parent = parent as? ListNode {
       let newListItem = ListItemNode()
-      let newList = createListNode(listType: parent.getListType())
+      let newList = try createListNode(listType: parent.getListType())
       try newListItem.append([newList])
       try newList.append([listItemNode])
 
@@ -372,11 +372,11 @@ internal func handleOutdent(_ listItemNode: ListItemNode) throws {
       // otherwise, we need to split the siblings into two new nested lists
       let listType = parentList.getListType()
       let previousSiblingsListItem = ListItemNode()
-      let previousSiblingsList = createListNode(listType: listType)
+      let previousSiblingsList = try createListNode(listType: listType)
       try previousSiblingsListItem.append([previousSiblingsList])
       try previousSiblingsList.append(listItemNode.getPreviousSiblings())
       let nextSiblingsListItem = ListItemNode()
-      let nextSiblingsList = createListNode(listType: listType)
+      let nextSiblingsList = try createListNode(listType: listType)
       try nextSiblingsListItem.append([nextSiblingsList])
       try nextSiblingsList.append(listItemNode.getNextSiblings())
       // put the sibling nested lists on either side of the grandparent list item in the great grandparent.

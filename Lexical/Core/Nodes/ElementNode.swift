@@ -6,20 +6,48 @@
  */
 
 import Foundation
+import UIKit
+
+public enum ElementFormatType: String, CaseIterable, Decodable {
+    case left
+    case start
+    case center
+    case right
+    case end
+    case justify
+    
+    public var textAlignment: NSTextAlignment {
+        switch self {
+        case .left:
+            return .left
+        case .start:
+            return .left
+        case .center:
+            return .center
+        case .right:
+            return .right
+        case .end:
+            return .right
+        case .justify:
+            return .justified
+        }
+    }
+}
 
 open class ElementNode: Node {
   enum CodingKeys: String, CodingKey {
     case children
     case direction
     case indent
-    case format // text alignment. Not supported yet.
+    case format
   }
 
   // TODO: once the various accessor methods are written, make this var private
   var children: [NodeKey] = []
   var direction: Direction?
   var indent: Int = 0
-    var textStyle: String = ""
+  var textStyle: String = ""
+    var format: ElementFormatType = .left
 
   func getDirection() -> Direction? {
     return direction
@@ -68,6 +96,8 @@ open class ElementNode: Node {
 
     self.direction = try container.decodeIfPresent(Direction.self, forKey: .direction)
     self.indent = try container.decodeIfPresent(Int.self, forKey: .indent) ?? 0
+      self.format = try container.decodeIfPresent(ElementFormatType.self, forKey: .format) ?? .left
+    
     try super.init(from: decoder)
 
     for node in childNodes {
@@ -81,7 +111,7 @@ open class ElementNode: Node {
     try container.encode(self.getChildren(), forKey: .children)
     try container.encode(self.direction, forKey: .direction)
     try container.encode(self.indent, forKey: .indent)
-    try container.encode("", forKey: .format)
+      try container.encode(self.format.rawValue, forKey: .format)
   }
 
   @discardableResult
@@ -100,6 +130,8 @@ open class ElementNode: Node {
     let node = getLatest() as ElementNode
     return node.indent
   }
+    
+    
 
   @discardableResult
   open func setIndent(_ indent: Int) throws -> ElementNode {
@@ -107,6 +139,19 @@ open class ElementNode: Node {
     let node = try getWritable() as ElementNode
     node.indent = indent
     return node
+  }
+    
+  open func getFormat() -> ElementFormatType {
+      let node = getLatest() as ElementNode
+      return node.format
+  }
+  
+  @discardableResult
+  open func setFormat(_ format: ElementFormatType) throws -> ElementNode {
+      try errorOnReadOnly()
+      let node = try getWritable() as ElementNode
+      node.format = format
+      return node
   }
 
   open func append(_ nodesToAppend: [Node]) throws {

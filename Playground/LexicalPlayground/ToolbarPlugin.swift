@@ -105,6 +105,7 @@ public class ToolbarPlugin: NSObject, Plugin {
     var insertImageButton: UIBarButtonItem?
     var foregroundColorButton: UIBarButtonItem?
     var backgroundColorButton: UIBarButtonItem?
+    var textAlignmentButton: UIBarButtonItem?
     
     private func setUpToolbar() {
         let undo = UIBarButtonItem(
@@ -126,6 +127,9 @@ public class ToolbarPlugin: NSObject, Plugin {
         
         let styling = UIBarButtonItem(image: UIImage(systemName: "bold.italic.underline"), menu: self.stylingMenu)
         self.stylingButton = styling
+        
+        let alignment = UIBarButtonItem(title: "Text Alignment", menu: self.textAlignmentMenu)
+        self.textAlignmentButton = alignment
         
         let link = UIBarButtonItem(
             image: UIImage(systemName: "link"),
@@ -176,6 +180,7 @@ public class ToolbarPlugin: NSObject, Plugin {
             decreaseIndent,
             increaseIndent,
             insertImage,
+            alignment,
             foregroundColor,
             backgroundColor
         ]
@@ -273,6 +278,53 @@ public class ToolbarPlugin: NSObject, Plugin {
     }
     
     // MARK: - Paragraph Styles
+    
+    private var textAlignmentMenuItems: [UIAction] {
+        [
+            UIAction(
+                title: "LeftAlign",
+                image: UIImage(systemName: "text.alignleft"),
+                state: .on,
+                handler: { [weak self] (_) in
+                    self?.editor?.dispatchCommand(type: .formatElement, payload: ElementFormatType.left)
+            }),
+            UIAction(
+                title: "RightAlign",
+                image: UIImage(systemName: "text.alignleft"),
+                state: .on,
+                handler: { [weak self] (_) in
+                    self?.editor?.dispatchCommand(type: .formatElement, payload: ElementFormatType.right)
+                }),
+            UIAction(
+                title: "Justify",
+                image: UIImage(systemName: "text.alignleft"),
+                state: .on,
+                handler: { [weak self] (_) in
+                    self?.editor?.dispatchCommand(type: .formatElement, payload: ElementFormatType.justify)
+                }),
+            UIAction(
+                title: "Center",
+                image: UIImage(systemName: "text.alignleft"),
+                state: .on,
+                handler: { [weak self] (_) in
+                    self?.editor?.dispatchCommand(type: .formatElement, payload: ElementFormatType.center)
+                }),
+            UIAction(
+                title: "End",
+                image: UIImage(systemName: "text.alignleft"),
+                state: .on,
+                handler: { [weak self] (_) in
+                    self?.editor?.dispatchCommand(type: .formatElement, payload: ElementFormatType.end)
+                }),
+            UIAction(
+                title: "Start",
+                image: UIImage(systemName: "text.alignleft"),
+                state: .on,
+                handler: { [weak self] (_) in
+                    self?.editor?.dispatchCommand(type: .formatElement, payload: ElementFormatType.start)
+                }),
+        ]
+    }
     
     private var paragraphMenuItems: [UIAction] {
         return [
@@ -381,6 +433,10 @@ public class ToolbarPlugin: NSObject, Plugin {
                 setBlocksType(selection: selection, createElement: creationFunc)
             }
         }
+    }
+    
+    private var textAlignmentMenu: UIMenu {
+        return UIMenu(title: "Text Alignment", image: nil, identifier: nil, options: [], children: self.textAlignmentMenuItems)
     }
     
     private var paragraphMenu: UIMenu {

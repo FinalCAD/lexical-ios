@@ -127,20 +127,12 @@ extension Lexical.TextNode: NodeHTMLSupport {
             return (after: nil, forChild: nil, node: [])
         }
         
-        let parentDom = node.parent()
-        var textContent = domNode.text()
-//
-        
-//
-//        let regex = try Regex("/\r/")
-//        textContent = textContent.replace(Regex("\r"), with:" ")
-//        
+        let textContent = domNode.text()
+
         return (after: nil, forChild: nil, node: [createTextNode(text: textContent)])
     }
     
     private static func applyTextFormatFromStyle(_ style: TextNodeStyle, shouldApply: TextFormatType?) -> DOMChildConversion {
-//        let fontWeigth = style.
-        
         return { node, _ in
             guard let textNode = node as? Lexical.TextNode else {
                 return node

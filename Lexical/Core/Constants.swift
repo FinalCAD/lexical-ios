@@ -115,6 +115,7 @@ public struct CommandType: RawRepresentable, Hashable {
   public static let deleteWord = CommandType(rawValue: "deleteWord")
   public static let deleteLine = CommandType(rawValue: "deleteLine")
   public static let formatText = CommandType(rawValue: "formatText")
+  public static let formatElement = CommandType(rawValue: "formatElement")
   public static let keyArrowRight = CommandType(rawValue: "keyArrowRight")
   public static let keyArrowLeft = CommandType(rawValue: "keyArrowLeft")
   public static let keyArrowUp = CommandType(rawValue: "keyArrowUp")

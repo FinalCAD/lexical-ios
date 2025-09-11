@@ -1,25 +1,24 @@
-//
-//  SwiftSoup+Attributes.swift
-//  Lexical
-//
-//  Created by Julien SMOLARECK on 23/08/2025.
-//
+/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
 
 import SwiftSoup
 
-struct NodeStyle {
-    enum TextAlign: String {
+public struct NodeStyle {
+    public enum TextAlign: String {
         case left
         case right
         case center
         case justify
+        case end
+        case start
     }
-//    let fontWeight
-    
-    var paddingInlineState: Int?
-    var textAlign: TextAlign?
-    
-    
+
+    public private(set) var paddingInlineState: Int?
+    public private(set) var textAlign: TextAlign?
     
     init(paddingInlineState: Int? = nil, textAlign: TextAlign? = nil) {
         self.paddingInlineState = paddingInlineState
@@ -58,7 +57,7 @@ struct NodeStyle {
 }
 
 extension SwiftSoup.Attributes {
-    func styles() -> NodeStyle? {
-        NodeStyle(from: get(key: "styles"))
+    public func styles() -> NodeStyle? {
+        NodeStyle(from: get(key: "style"))
     }
 }

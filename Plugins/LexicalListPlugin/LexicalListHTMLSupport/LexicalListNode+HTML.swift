@@ -19,7 +19,7 @@ extension LexicalListPlugin.ListNode: NodeHTMLSupport {
         ]
     }
     
-    private static func convertListNode(_ element: SwiftSoup.Node) -> DOMConversionOutput {
+    private static func convertListNode(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
         guard let element = element as? SwiftSoup.Element else {
             return (after: nil, forChild: nil, node: [])
         }
@@ -28,9 +28,9 @@ extension LexicalListPlugin.ListNode: NodeHTMLSupport {
         
         switch element.tagName() {
         case "ol":
-            node = createListNode(listType: .number, start: 1)
+            node = try createListNode(listType: .number, start: 1)
         case "ul":
-            node = createListNode(listType: .bullet)
+            node = try createListNode(listType: .bullet)
         default:
             break
         }

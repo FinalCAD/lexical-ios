@@ -342,6 +342,7 @@ open class TextNode: Node {
             format = TextFormat()
         }
         
+        
         style.patch(&attributeDictionary)
         
         if format.bold {

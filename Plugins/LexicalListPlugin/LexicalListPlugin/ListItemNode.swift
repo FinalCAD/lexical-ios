@@ -54,6 +54,7 @@ public class ListItemNode: ElementNode {
     for node in nodesToAppend {
       if let node = node as? ElementNode, self.canMergeWith(node: node) {
         let children = node.getChildren()
+          try setFormat(node.getFormat())
         try self.append(children)
         try node.remove()
       } else {
@@ -77,7 +78,7 @@ public class ListItemNode: ElementNode {
       try list.insertAfter(nodeToInsert: replaceWithNode)
     } else {
       // Split the list
-      let newList = createListNode(listType: list.getListType())
+      let newList = try createListNode(listType: list.getListType())
       var nextSibling = self.getNextSibling()
       while nextSibling != nil {
         guard let nodeToAppend = nextSibling else { continue }
@@ -108,7 +109,12 @@ public class ListItemNode: ElementNode {
 
     if let node = node as? ListItemNode {
       let after = try super.insertAfter(nodeToInsert: node)
+        
       let afterListNode = try node.getParentOrThrow()
+        
+//        if let itemNode = after as? ListItemNode {
+//            try itemNode.append([createTextNode(text: "toto")])
+//        }
 
       if let afterListNode = afterListNode as? ListNode {
         try updateChildrenListItemValue(list: afterListNode, children: nil)
@@ -135,7 +141,7 @@ public class ListItemNode: ElementNode {
     _ = try listNode.insertAfter(nodeToInsert: node)
 
     if !siblings.isEmpty {
-      let newListNode = createListNode(listType: listNode.getListType())
+      let newListNode = try createListNode(listType: listNode.getListType())
       try newListNode.append(siblings)
       _ = try node.insertAfter(nodeToInsert: newListNode)
     }
@@ -168,8 +174,11 @@ public class ListItemNode: ElementNode {
 
   override public func insertNewAfter(selection: RangeSelection?) throws -> Node? {
     let newElement = ListItemNode()
+      let format = getFormat()
+      
+      try newElement.setFormat(format)
     _ = try self.insertAfter(nodeToInsert: newElement)
-
+      
     return newElement
   }
 
@@ -251,6 +260,7 @@ public class ListItemNode: ElementNode {
 
     var attributes: [NSAttributedString.Key: Any] = theme.listItem ?? [:]
     attributes[.paddingHead] = attributes[.paddingHead] ?? theme.indentSize
+      attributes[.paddingTail] = attributes[.paddingTail] ?? -theme.indentSize
 
     if node.getChildren().first is ListNode {
       // Don't apply styles for this list item, because there's another list inside it (don't want to draw two bullets!)
@@ -292,7 +302,7 @@ public class ListItemNode: ElementNode {
     attributes[.listItem] = ListItemAttribute(
       itemNodeKey: node.key,
       listItemCharacter: character,
-      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.8) * theme.indentSize
+      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.3) * theme.indentSize
     )
 
     return attributes

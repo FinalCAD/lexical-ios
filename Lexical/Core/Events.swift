@@ -92,6 +92,10 @@ internal func onDeleteLineFromUITextView(editor: Editor) throws {
   editor.frontend?.showPlaceholderText()
 }
 
+internal func onFormatElementFromUITextView(editor: Editor, type: ElementFormatType) throws {
+    try updateElementFormat(type: type, editor: editor)
+}
+
 internal func onFormatTextFromUITextView(editor: Editor, type: TextFormatType) throws {
   try updateTextFormat(type: type, editor: editor)
 }
@@ -328,6 +332,21 @@ public func registerRichText(editor: Editor) {
         print("\(error)")
       }
       return true
+    })
+    
+    _ = editor.registerCommand(
+        type: .formatElement,
+        listener: { [weak editor] payload in
+        guard let editor else { return false }
+        do {
+            guard let element = payload as? ElementFormatType else { return false }
+            
+            try onFormatElementFromUITextView(editor: editor, type: element)
+            return true
+        } catch {
+            print("\(error)")
+        }
+        return true
     })
 
   _ = editor.registerCommand(

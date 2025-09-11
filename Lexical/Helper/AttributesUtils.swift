@@ -85,7 +85,10 @@ enum AttributeUtils {
 
     combinedAttributes[.font] = font
 
-    if let paragraphStyle = getParagraphStyle(attributes: combinedAttributes, indentSize: CGFloat(theme.indentSize)) {
+    if let paragraphStyle = getParagraphStyle(
+      attributes: combinedAttributes,
+      indentSize: CGFloat(theme.indentSize)
+    ) {
       combinedAttributes[.paragraphStyle] = paragraphStyle
       combinedAttributes[.paragraphSpacingBefore_internal] = paragraphStyle.paragraphSpacingBefore
       combinedAttributes[.paragraphSpacing_internal] = paragraphStyle.paragraphSpacing
@@ -104,16 +107,29 @@ enum AttributeUtils {
     theme: Theme
   ) -> [[NSAttributedString.Key: Any]] {
     var node = node
+      
     var attributes = [[NSAttributedString.Key: Any]]()
     attributes.append(node.getAttributedStringAttributes(theme: theme))
     if let elementNode = node as? ElementNode, elementNode.isInline() == false {
-      attributes.append([.indent_internal: elementNode.getIndent()])
+//        let paragraphStyle = NSMutableParagraphStyle()
+//        paragraphStyle.alignment = elementNode.getFormat().textAlignment
+        
+        attributes.append([
+            .indent_internal: elementNode.getIndent(),
+//                .paragraphStyle: paragraphStyle
+        ])
     }
 
     while let parent = node.parent, let parentNode = state.nodeMap[parent] {
       attributes.append(parentNode.getAttributedStringAttributes(theme: theme))
       if let elementNode = parentNode as? ElementNode, elementNode.isInline() == false {
-        attributes.append([.indent_internal: elementNode.getIndent()])
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.alignment = elementNode.getFormat().textAlignment
+        
+          attributes.append([
+            .indent_internal: elementNode.getIndent(),
+                .paragraphStyle: paragraphStyle
+          ])
       }
       node = parentNode
     }
@@ -121,8 +137,8 @@ enum AttributeUtils {
     return attributes
   }
 
-  private static func getParagraphStyle(attributes: [NSAttributedString.Key: Any], indentSize: CGFloat) -> NSParagraphStyle? {
-    let paragraphStyle = NSMutableParagraphStyle()
+  private static func getParagraphStyle(attributes: [NSAttributedString.Key: Any], indentSize: CGFloat) -> NSMutableParagraphStyle? {
+      let paragraphStyle = (attributes[.paragraphStyle] as? NSParagraphStyle)?.mutableCopy() as? NSMutableParagraphStyle ?? NSMutableParagraphStyle()
     var styleFound = false
 
     var leftPadding: CGFloat = 0

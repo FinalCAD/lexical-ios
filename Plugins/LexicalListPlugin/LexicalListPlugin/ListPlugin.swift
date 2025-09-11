@@ -67,6 +67,8 @@ open class ListPlugin: Plugin {
           mutableParagraphStyle.tailIndent = 0
           spacingBefore = isFirstLine ? 0 : paragraphStyle.paragraphSpacingBefore
           mutableParagraphStyle.paragraphSpacingBefore = 0
+            mutableParagraphStyle.alignment = .left
+//            attributes[.foregroundColor] = LexicalConstants.
           attributes[.paragraphStyle] = mutableParagraphStyle
         }
         attributes.removeValue(forKey: .underlineStyle)

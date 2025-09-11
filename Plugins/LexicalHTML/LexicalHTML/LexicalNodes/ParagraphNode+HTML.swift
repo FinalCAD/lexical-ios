@@ -13,7 +13,6 @@ extension Lexical.ParagraphNode: NodeHTMLSupport {
         [
             "p": convertParagraphElement
         ]
-        
     }
     
     private static func convertParagraphElement(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
@@ -22,33 +21,12 @@ extension Lexical.ParagraphNode: NodeHTMLSupport {
         if let style = element.getAttributes()?.styles() {
             let indent = (style.paddingInlineState ?? 0) / 40
             
+            try node.setIndent(indent)
             
-//            if let paddingInlineStart = style.paddingInlineStart {
-//                try node.setIndent(paddingInlineStart / 40)
-//            }
-//            
-//            if let textAlign = style.textAlign {
-//                switch textAlign {
-//                case .left:
-//                    try node.setDirection(direction: .left)
-//                case .right:
-//                    try node.setDirection(direction: .right)
-//                default:
-//                    break
-//                }
-//            }
-            //            node.setDirection(direction: .)
+            if let textAlign = style.textAlign?.rawValue {
+                try node.setFormat(ElementFormatType(rawValue: textAlign) ?? .left)
+            }
         }
-        
-        if let attributes = element.getAttributes() {
-            //            if attributes.hasKey(key: "style")
-        }
-        if element.hasAttr("style") {
-            //            if let padding = domNode.attr("style").split(separator: ":").last?.trimmingCharacters(in: .whitespacesAndNewlines) {
-            //
-            //            }
-        }
-        
         
         return (after: nil, forChild: nil, node: [node])
     }
@@ -56,9 +34,23 @@ extension Lexical.ParagraphNode: NodeHTMLSupport {
     public func exportDOM(editor: Lexical.Editor) throws -> DOMExportOutput {
         let dom = SwiftSoup.Element(Tag("p"), "")
         
+        var style: [String] = []
+        
         if getIndent() > 0 {
-            try dom.attr("style", "padding-inline-start:\(getIndent() * 40)px")
+            style.append("padding-inline-start:\(getIndent() * 40)px")
+            
         }
+        
+        let format = getFormat()
+        if format != .left {
+            style.append("text-align:\(format.rawValue)")
+        }
+        
+        if style.isEmpty == false {
+            try dom.attr("style", style.joined(separator: ";"))
+        }
+        
+        
         return (after: nil, element: dom)
     }
 }

@@ -18,8 +18,20 @@ extension LexicalListPlugin.ListItemNode: NodeHTMLSupport {
         ]
     }
     
-    private static func convertListItemElement(_ element: SwiftSoup.Node) -> DOMConversionOutput {
-        (after: nil, forChild: nil, node: [ListItemNode()])
+    private static func convertListItemElement(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
+        let node = ListItemNode()
+        
+        if let style = element.getAttributes()?.styles() {
+            let indent = (style.paddingInlineState ?? 0) / 40
+            
+            try node.setIndent(indent)
+            
+            if let textAlign = style.textAlign?.rawValue {
+                try node.setFormat(ElementFormatType(rawValue: textAlign) ?? .left)
+            }
+        }
+        
+        return (after: nil, forChild: nil, node: [node])
     }
     
     public func exportDOM(editor: Lexical.Editor) throws -> DOMExportOutput {
@@ -27,6 +39,23 @@ extension LexicalListPlugin.ListItemNode: NodeHTMLSupport {
         if getValue() > 0 {
             try dom.attr("value", "\(getValue())")
         }
+        
+        var style: [String] = []
+        
+        if getIndent() > 0 {
+            style.append("padding-inline-start:\(getIndent() * 40)px")
+            
+        }
+        
+        let format = getFormat()
+        if format != .left {
+            style.append("text-align:\(format.rawValue)")
+        }
+        
+        if style.isEmpty == false {
+            try dom.attr("style", style.joined(separator: ";"))
+        }
+        
         return (after: nil, element: dom)
     }
 }
