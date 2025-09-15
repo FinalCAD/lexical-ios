@@ -12,6 +12,7 @@ import LexicalLinkPlugin
 import LexicalListPlugin
 import UIKit
 import LexicalHTML
+import LexicalAutoLinkPlugin
 import SwiftSoup
 
 class ViewController: UIViewController, UIToolbarDelegate {
@@ -38,6 +39,7 @@ class ViewController: UIViewController, UIToolbarDelegate {
         let htmlPlugin = HTMLPlugin()
         
         let linkPlugin = LinkPlugin()
+        let autolinkPlugin = AutoLinkPlugin()
         
         let theme = Theme()
         theme.indentSize = 40.0
@@ -58,7 +60,8 @@ class ViewController: UIViewController, UIToolbarDelegate {
                 imagePlugin,
                 linkPlugin,
                 editorHistoryPlugin,
-                htmlPlugin
+                htmlPlugin,
+                autolinkPlugin
             ]
         )
         let lexicalView = LexicalView(editorConfig: editorConfig, featureFlags: FeatureFlags())

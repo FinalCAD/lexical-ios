@@ -25,6 +25,7 @@
 		06F7CF962A545C7C0024CD5A /* lexical-logo.png in Resources */ = {isa = PBXBuildFile; fileRef = 06F7CF952A545C7C0024CD5A /* lexical-logo.png */; };
 		3C48FEE42B04F2C5009BBFA2 /* LexicalMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = 3C48FEE32B04F2C5009BBFA2 /* LexicalMarkdown */; };
 		F9A5776C2E586A1100AB5735 /* HTMLImportPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9A5776B2E586A1100AB5735 /* HTMLImportPlugin.swift */; };
+		F9DAFE9C2E731034006A239D /* LexicalAutoLinkPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = F9DAFE9B2E731034006A239D /* LexicalAutoLinkPlugin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 				0630DC162A2F624D009EB23B /* LexicalLinkPlugin in Frameworks */,
 				0656CF9929D23743009CA08F /* Lexical in Frameworks */,
 				06F7CF942A542E4E0024CD5A /* LexicalInlineImagePlugin in Frameworks */,
+				F9DAFE9C2E731034006A239D /* LexicalAutoLinkPlugin in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -139,6 +141,7 @@
 				065B5C852A22291C003A38DB /* SelectableDecoratorNode */,
 				065F9DF62A5EC1D600C95087 /* EditorHistoryPlugin */,
 				3C48FEE32B04F2C5009BBFA2 /* LexicalMarkdown */,
+				F9DAFE9B2E731034006A239D /* LexicalAutoLinkPlugin */,
 			);
 			productName = LexicalPlayground;
 			productReference = 0656CF7529D1E438009CA08F /* LexicalPlayground.app */;
@@ -458,6 +461,10 @@
 		3C48FEE32B04F2C5009BBFA2 /* LexicalMarkdown */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = LexicalMarkdown;
+		};
+		F9DAFE9B2E731034006A239D /* LexicalAutoLinkPlugin */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LexicalAutoLinkPlugin;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

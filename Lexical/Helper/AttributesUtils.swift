@@ -111,12 +111,8 @@ enum AttributeUtils {
     var attributes = [[NSAttributedString.Key: Any]]()
     attributes.append(node.getAttributedStringAttributes(theme: theme))
     if let elementNode = node as? ElementNode, elementNode.isInline() == false {
-//        let paragraphStyle = NSMutableParagraphStyle()
-//        paragraphStyle.alignment = elementNode.getFormat().textAlignment
-        
         attributes.append([
             .indent_internal: elementNode.getIndent(),
-//                .paragraphStyle: paragraphStyle
         ])
     }
 
@@ -128,7 +124,7 @@ enum AttributeUtils {
         
           attributes.append([
             .indent_internal: elementNode.getIndent(),
-                .paragraphStyle: paragraphStyle
+            .paragraphStyle: paragraphStyle
           ])
       }
       node = parentNode

@@ -494,6 +494,8 @@ open class TextNode: Node {
         let offsetsSet = Set(splitOffsets)
         var parts = [String]()
         var string: NSMutableString = NSMutableString(string: "")
+        // Handle selection
+        let selection = try getSelection()
         
         for i in 0..<textLength {
             if string != "" && offsetsSet.contains(i) {
@@ -535,8 +537,7 @@ open class TextNode: Node {
             writableNode = try getWritable()
             writableNode.text = firstPart
         }
-        // Handle selection
-        let selection = try getSelection()
+        
         
         // Then handle all other parts
         var splitNodes = [writableNode]

@@ -37,6 +37,9 @@ let package = Package(
       name: "EditorHistoryPlugin",
       targets: ["EditorHistoryPlugin"]),
     .library(
+        name: "LexicalAutoLinkPlugin",
+        targets: ["LexicalAutoLinkPlugin"]),
+    .library(
       name: "LexicalMarkdown",
       targets: ["LexicalMarkdown"]),
   ],
@@ -107,6 +110,15 @@ let package = Package(
       name: "EditorHistoryPluginTests",
       dependencies: ["Lexical", "EditorHistoryPlugin"],
       path: "./Plugins/EditorHistoryPlugin/EditorHistoryPluginTests"),
+    
+    .target(
+        name: "LexicalAutoLinkPlugin",
+        dependencies: ["Lexical", "LexicalLinkPlugin"],
+        path: "./Plugins/LexicalAutoLinkPlugin/LexicalAutoLinkPlugin"),
+//    .testTarget(
+//        name: "AutoLinkPluginTests",
+//        dependencies: ["Lexical", "AutoLinkPlugin"],
+//        path: "./Plugins/AutoLinkPlugin/AutoLinkPluginTests"),
 
     .target(
       name: "LexicalMarkdown",
