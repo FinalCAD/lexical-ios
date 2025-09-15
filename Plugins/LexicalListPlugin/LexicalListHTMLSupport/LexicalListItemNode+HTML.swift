@@ -11,7 +11,7 @@ import LexicalHTML
 import LexicalListPlugin
 import SwiftSoup
 
-extension LexicalListPlugin.ListItemNode: NodeHTMLSupport {
+extension LexicalListPlugin.ListItemNode: @retroactive NodeHTMLSupport {
     public static func importDOM() throws -> DOMConversionMap {
         [
             "li": convertListItemElement
