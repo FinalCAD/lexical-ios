@@ -297,12 +297,16 @@ public class ListItemNode: ElementNode {
         break
       }
     }
+      
+      let attributedString = NSAttributedString(string: character, attributes: theme.text)
+      let line = CTLineCreateWithAttributedString(attributedString)
+      let lineBounds = CTLineGetBoundsWithOptions(line, .useGlyphPathBounds)
 
     // the magic number is to horizontally position the bullet further left than the indent size, but not so far as to hit the previous indent stop.
     attributes[.listItem] = ListItemAttribute(
       itemNodeKey: node.key,
       listItemCharacter: character,
-      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.3) * theme.indentSize
+      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.1) * theme.indentSize - lineBounds.width
     )
 
     return attributes
