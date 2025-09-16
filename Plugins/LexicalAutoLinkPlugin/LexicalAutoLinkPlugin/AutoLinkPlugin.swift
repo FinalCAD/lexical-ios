@@ -134,36 +134,59 @@ open class AutoLinkPlugin: Plugin {
     }
     
     private func findFirstMatch(text: String) -> [LinkMatcher] {
-        let emailMatcher = #"^\S+@\S+\.\S+$"#
-        let urlMatcher = "((?:http|https):\\/\\/)?(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(\\/(?<=\\/)(?:[\\w\\d\\-./_]+)?)?"
+//        let emailMatcher = #"^\S+@\S+\.\S+$"#
+//        let urlMatcher = "((?:http|https):\\/\\/)?(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(\\/(?<=\\/)(?:[\\w\\d\\-./_]+)?)?"
         var linkMatcher = [LinkMatcher]()
+        let types: NSTextCheckingResult.CheckingType = [.link]
+        let detector = try? NSDataDetector(types: types.rawValue)
+        let range = NSRange(text.startIndex..<text.endIndex, in: text)
+        var index = -1
         
-        let splitArray = text.split(separator: " ")
-        // find url
-        for (index, subString) in splitArray.enumerated() {
-            let predicate = NSPredicate(format: "SELF MATCHES %@", argumentArray: [urlMatcher])
-            if predicate.evaluate(with: String(subString.lowercased())) {
-                var newURLString = String(subString)
-                if !newURLString.hasPrefix("https://") || !newURLString.hasPrefix("http://") {
-                    newURLString = "https://" + newURLString
-                }
-                
-                let newNSRange = (text as NSString).range(of: String(subString))
-                
-                linkMatcher.append(LinkMatcher(index: index, text: String(subString), url: newURLString, range: newNSRange))
+        detector?.enumerateMatches(in: text, options: [], range: range) { match, flags, _ in
+            index += 1
+            guard let match else {
+                return
             }
             
-            // find email
-            let result = subString.range(of: emailMatcher, options: [.regularExpression], range: nil, locale: nil)
-            if result != nil {
-                let urlString = "mailto:" + String(subString)
-                let newNSRange = (text as NSString).range(of: String(subString))
-                
-                linkMatcher.append(LinkMatcher(index: index, text: String(subString), url: urlString, range: newNSRange))
+            
+            switch match.resultType {
+            case .link:
+                let label = String(text[Range(match.range, in: text)!])
+                let url =  match.url?.absoluteString ?? ""
+                linkMatcher.append(LinkMatcher(index: index, text: label, url: url, range: match.range))
+            default:
+                return
             }
         }
         
         return linkMatcher
+        
+//        let splitArray = text.split(separator: " ")
+//        // find url
+//        for (index, subString) in splitArray.enumerated() {
+//            let predicate = NSPredicate(format: "SELF MATCHES %@", argumentArray: [urlMatcher])
+//            if predicate.evaluate(with: String(subString.lowercased())) {
+//                var newURLString = String(subString)
+//                if !newURLString.hasPrefix("https://") || !newURLString.hasPrefix("http://") {
+//                    newURLString = "https://" + newURLString
+//                }
+//                
+//                let newNSRange = (text as NSString).range(of: String(subString))
+//                
+//                linkMatcher.append(LinkMatcher(index: index, text: String(subString), url: newURLString, range: newNSRange))
+//            }
+//            
+//            // find email
+//            let result = subString.range(of: emailMatcher, options: [.regularExpression], range: nil, locale: nil)
+//            if result != nil {
+//                let urlString = "mailto:" + String(subString)
+//                let newNSRange = (text as NSString).range(of: String(subString))
+//                
+//                linkMatcher.append(LinkMatcher(index: index, text: String(subString), url: urlString, range: newNSRange))
+//            }
+//        }
+//        
+//        return linkMatcher
     }
     
     private func handleLinkCreation(node: TextNode) throws {
@@ -284,13 +307,16 @@ open class AutoLinkPlugin: Plugin {
         
         let startChar = String(text[text.startIndex])
         if let previousSibling = previousSibling as? LinkNode, startChar != " " {
-            try replaceWithChildren(node: previousSibling)
+            try previousSibling.append([textNode])
+            try handleLinkEdit(linkNode: previousSibling)
+//            try replaceWithChildren(node: previousSibling)
         }
         
         let endIndex = text.index(before: text.endIndex)
         let lastChar = String(text[endIndex])
         if let nextSibling = nextSibling as? LinkNode, lastChar != " " {
             try replaceWithChildren(node: nextSibling)
+            try handleLinkEdit(linkNode: nextSibling)
         }
     }
 }
