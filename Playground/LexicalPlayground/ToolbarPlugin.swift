@@ -75,7 +75,9 @@ public class ToolbarPlugin: NSObject, Plugin {
                     return false
                 }
                 
-                _ = self.showLinkActionSheet(url: payload.absoluteString, selection: selection)
+                let text = try? selection.getTextContent()
+                
+                _ = self.showLinkActionSheet(url: payload.absoluteString, label: text ?? "", selection: selection)
                 return true
             }
             return false // shouldn't happen!
@@ -537,13 +539,14 @@ public class ToolbarPlugin: NSObject, Plugin {
                 guard let selection = try getSelection() as? RangeSelection else { return }
                 
                 let node = try getSelectedNode(selection: selection)
+                let text = try selection.getTextContent()
                 if let node = node as? LinkNode {
-                    _ = showLinkActionSheet(url: node.getURL(), selection: selection)
+                    _ = showLinkActionSheet(url: node.getURL(), label: text, selection: selection)
                 } else if let parent = node.getParent() as? LinkNode {
-                    _ = showLinkActionSheet(url: parent.getURL(), selection: selection)
+                    _ = showLinkActionSheet(url: parent.getURL(), label: text, selection: selection)
                 } else {
                     let urlString = "https://"
-                    showAlert(url: urlString, isEdit: false)
+                    showAlert(url: urlString, label: urlString, isEdit: false)
                 }
             }
         } catch {
@@ -570,7 +573,7 @@ public class ToolbarPlugin: NSObject, Plugin {
         }
     }
     
-    func showAlert(url: String?, isEdit: Bool, selection: RangeSelection? = nil) {
+    func showAlert(url: String?, label: String?, isEdit: Bool, selection: RangeSelection? = nil) {
         guard let url, let editor else { return }
         
         var originalSelection: RangeSelection?
@@ -588,10 +591,12 @@ public class ToolbarPlugin: NSObject, Plugin {
         let doneAction = UIAlertAction(title: "Done", style: .default) { [weak self, weak alertController] action in
             guard let strongSelf = self else { return }
             
-            if let textField = alertController?.textFields?.first, let originalSelection {
-                
+            if let url = alertController?.textFields?.first, let label = alertController?.textFields?[1], let originalSelection {
                 let updateSelection = isEdit ? selection : originalSelection
-                strongSelf.editor?.dispatchCommand(type: .link, payload: LinkPayload(urlString: textField.text ?? "", originalSelection: updateSelection))
+                strongSelf.editor?.dispatchCommand(
+                    type: .link,
+                    payload: LinkPayload(urlString: url.text ?? "", label: label.text ?? "", originalSelection: updateSelection)
+                )
             }
         }
         
@@ -602,19 +607,24 @@ public class ToolbarPlugin: NSObject, Plugin {
             textField.text = url
         }
         
+        alertController.addTextField { textField in
+            textField.layer.cornerRadius = 20
+            textField.text = label
+        }
+        
         alertController.addAction(doneAction)
         alertController.addAction(cancelAction)
         
         viewControllerForPresentation?.present(alertController, animated: true)
     }
     
-    public func showLinkActionSheet(url: String, selection: RangeSelection?) -> Bool {
+    public func showLinkActionSheet(url: String, label: String, selection: RangeSelection?) -> Bool {
         let actionSheet = UIAlertController(title: "Link Action", message: nil, preferredStyle: .alert)
         
         let removeLinkAction = UIAlertAction(title: "Remove Link", style: .default) { [weak self] action in
             guard let strongSelf = self else { return }
             
-            strongSelf.editor?.dispatchCommand(type: .link, payload: LinkPayload(urlString: nil, originalSelection: selection))
+            strongSelf.editor?.dispatchCommand(type: .link, payload: LinkPayload(urlString: nil, label: nil, originalSelection: selection))
         }
         
         let visitLinkAction = UIAlertAction(title: "Visit Link", style: .default) { [weak self] action in
@@ -639,7 +649,7 @@ public class ToolbarPlugin: NSObject, Plugin {
             guard let strongSelf = self else { return }
             guard let url = URL(string: url) else { return }
             
-            strongSelf.showAlert(url: url.absoluteString, isEdit: true, selection: selection)
+            strongSelf.showAlert(url: url.absoluteString, label: label, isEdit: true, selection: selection)
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
