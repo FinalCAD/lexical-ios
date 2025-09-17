@@ -401,7 +401,8 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
           
           
           if paragraphNode?.getChildrenSize() == 0 ||
-                (paragraphNode?.getChildrenSize() == 1 && paragraphNode?.getFirstChild<PlaceholderNode>() != nil) {
+                paragraphNode?.getTextContent().isEmpty == true ||
+                (paragraphNode?.getChildrenSize() == 1 && paragraphNode?.getFirstChild() is PlaceholderNode) {
               shouldShow = true
               return
           }
