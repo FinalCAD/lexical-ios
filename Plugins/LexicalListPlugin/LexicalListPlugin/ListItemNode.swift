@@ -272,8 +272,14 @@ public class ListItemNode: ElementNode {
     let node: ListItemNode = getLatest()
     let listNode = node.getParent() as? ListNode
 
+      
     var attributes: [NSAttributedString.Key: Any] = theme.listItem ?? [:]
-    attributes[.paddingHead] = attributes[.paddingHead] ?? theme.indentSize
+      var paddingHead: CGFloat = theme.indentSize
+      if let customPaddingHead = attributes[.paddingHead] as? Int {
+          paddingHead = CGFloat(customPaddingHead)
+      }
+      
+    attributes[.paddingHead] = paddingHead
       attributes[.paddingTail] = attributes[.paddingTail] ?? -theme.indentSize
 
     if node.getChildren().first is ListNode {
@@ -320,7 +326,7 @@ public class ListItemNode: ElementNode {
     attributes[.listItem] = ListItemAttribute(
       itemNodeKey: node.key,
       listItemCharacter: character,
-      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.1) * theme.indentSize - lineBounds.width
+      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.1) * paddingHead - lineBounds.width
     )
 
     return attributes
