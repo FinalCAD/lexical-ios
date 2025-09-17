@@ -13,7 +13,7 @@ import UIKit
 // before calling onInsertTextFromUITextView().
 
 internal func onInsertTextFromUITextView(text: String, editor: Editor, updateMode: UpdateBehaviourModificationMode = UpdateBehaviourModificationMode()) throws {
-  try editor.updateWithCustomBehaviour(mode: updateMode) {
+    try editor.updateWithCustomBehaviour(mode: updateMode, reason: .update) {
     guard let selection = try getSelection() else {
       editor.log(.UITextView, .error, "Expected a selection here")
       return
@@ -31,6 +31,11 @@ internal func onInsertTextFromUITextView(text: String, editor: Editor, updateMod
 
     if text == "\n" || text == "\u{2029}" {
       try selection.insertParagraph()
+        
+        if let updatedSelection = try getSelection(),
+           let selectedNode = try updatedSelection.getNodes().first {
+            editor.frontend?.resetTypingAttributes(for: selectedNode)
+        }
     } else if text == "\u{2028}" {
       try selection.insertLineBreak(selectStart: false)
     } else {
@@ -163,7 +168,7 @@ func checkIfTokenOrCanTextBeInserted(node: TextNode) -> Bool {
 internal func onSelectionChange(editor: Editor) {
   // Note: we have to detect selection changes here even if an update is in progress, otherwise marked text breaks!
   do {
-    try editor.updateWithCustomBehaviour(mode: UpdateBehaviourModificationMode(suppressReconcilingSelection: true, suppressSanityCheck: true)) {
+      try editor.updateWithCustomBehaviour(mode: UpdateBehaviourModificationMode(suppressReconcilingSelection: true, suppressSanityCheck: true), reason: .update) {
       let nativeSelection = editor.getNativeSelection()
       guard let editorState = getActiveEditorState() else {
         return
@@ -180,6 +185,8 @@ internal func onSelectionChange(editor: Editor) {
       }
 
       try lexicalSelection.applyNativeSelection(nativeSelection)
+          
+          
 
       switch lexicalSelection.anchor.type {
       case .text:
@@ -192,6 +199,12 @@ internal func onSelectionChange(editor: Editor) {
       default:
         break
       }
+          
+          if let updatedSelection = try getSelection(),
+             let selectedNode = try updatedSelection.getNodes().first {
+              editor.frontend?.resetTypingAttributes(for: selectedNode)
+          }
+          
       editor.dispatchCommand(type: .selectionChange, payload: nil)
     }
   } catch {
@@ -222,7 +235,6 @@ internal func handleIndentAndOutdent(insertTab: (Node) -> Void, indentOrOutdent:
 }
 
 public func registerRichText(editor: Editor) {
-
   _ = editor.registerCommand(
     type: .insertLineBreak,
     listener: { [weak editor] payload in

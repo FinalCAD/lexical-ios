@@ -67,7 +67,7 @@ public class Editor: NSObject {
           textStorage.replaceCharacters(in: NSRange(location: 0, length: textStorage.string.lengthAsNSString()), with: "")
           textStorage.mode = .none
         }
-        try? update {}
+          try? beginUpdate({}, mode: UpdateBehaviourModificationMode(), reason: .initialization)
       }
     }
   }
@@ -90,7 +90,16 @@ public class Editor: NSObject {
 
   // Used for deserialization and registration of nodes. Lexical's built-in nodes are registered
   // by default.
-  internal var registeredNodes: [NodeType: Node.Type] = [.root: RootNode.self, .text: TextNode.self, .element: ElementNode.self, .heading: HeadingNode.self, .paragraph: ParagraphNode.self, .quote: QuoteNode.self]
+    internal var registeredNodes: [NodeType: Node.Type] = [
+        .root: RootNode.self,
+        .text: TextNode.self,
+        .element: ElementNode.self,
+        .heading: HeadingNode.self,
+        .paragraph: ParagraphNode.self,
+        .quote: QuoteNode.self,
+        .placeholder: PlaceholderNode.self,
+        .linebreak: LineBreakNode.self
+    ]
 
   internal var nodeTransforms: [NodeType: [(Int, NodeTransform)]] = [:]
 
@@ -388,10 +397,10 @@ public class Editor: NSObject {
       for (_, node) in pendingEditorState.nodeMap {
         node.didMoveTo(newEditor: self)
       }
-      try? updateWithCustomBehaviour(mode: UpdateBehaviourModificationMode(suppressReconcilingSelection: false, suppressSanityCheck: true, markedTextOperation: nil, skipTransforms: true, allowUpdateWithoutTextStorage: false)) {}
+        try? updateWithCustomBehaviour(mode: UpdateBehaviourModificationMode(suppressReconcilingSelection: false, suppressSanityCheck: true, markedTextOperation: nil, skipTransforms: true, allowUpdateWithoutTextStorage: false), reason: .reset) {}
     } else {
       // create a default paragraph node here
-      try? updateWithCustomBehaviour(mode: UpdateBehaviourModificationMode(suppressReconcilingSelection: true, suppressSanityCheck: true, markedTextOperation: nil, skipTransforms: true, allowUpdateWithoutTextStorage: true)) {
+      try? updateWithCustomBehaviour(mode: UpdateBehaviourModificationMode(suppressReconcilingSelection: true, suppressSanityCheck: true, markedTextOperation: nil, skipTransforms: true, allowUpdateWithoutTextStorage: true), reason: .reset) {
         guard let root = getRoot() else { return }
         if root.getFirstChild() == nil {
           let paragraph = createParagraphNode()
@@ -465,7 +474,7 @@ public class Editor: NSObject {
       compositionKey = nil
     }
 
-    try beginUpdate({}, mode: UpdateBehaviourModificationMode())
+      try beginUpdate({}, mode: UpdateBehaviourModificationMode(), reason: .setState)
   }
 
   internal func testing_getPendingEditorState() -> EditorState? {
@@ -583,7 +592,7 @@ public class Editor: NSObject {
   // MARK: - Manipulating the editor state
 
   var isUpdating = false
-  private func beginUpdate(_ closure: () throws -> Void, mode: UpdateBehaviourModificationMode) throws {
+  private func beginUpdate(_ closure: () throws -> Void, mode: UpdateBehaviourModificationMode, reason: EditorUpdateReason = .update) throws {
     var editorStateWasCloned = false
 
     if pendingEditorState == nil {
@@ -606,9 +615,9 @@ public class Editor: NSObject {
 
     let isInsideNestedEditorBlock = (isEditorPresentInUpdateStack(self))
     let previousEditorStateForListeners = editorState
-    let dirtyNodesForListeners = dirtyNodes
+    var dirtyNodesForListeners = dirtyNodes
 
-    try runWithStateLexicalScopeProperties(activeEditor: self, activeEditorState: pendingEditorState, readOnlyMode: false) {
+    try runWithStateLexicalScopeProperties(activeEditor: self, activeEditorState: pendingEditorState, readOnlyMode: false, editorUpdateReason: reason) {
       let previouslyUpdating = self.isUpdating
       self.isUpdating = true
 
@@ -645,7 +654,13 @@ public class Editor: NSObject {
         }
 
         if !headless {
-          try Reconciler.updateEditorState(currentEditorState: editorState, pendingEditorState: pendingEditorState, editor: self, shouldReconcileSelection: !mode.suppressReconcilingSelection, markedTextOperation: mode.markedTextOperation)
+            try Reconciler.updateEditorState(
+                currentEditorState: editorState,
+                pendingEditorState: pendingEditorState,
+                editor: self,
+                shouldReconcileSelection: !mode.suppressReconcilingSelection,
+                markedTextOperation: mode.markedTextOperation
+            )
         }
         self.isUpdating = previouslyUpdating
         garbageCollectDetachedNodes(prevEditorState: editorState, editorState: pendingEditorState, dirtyLeaves: dirtyNodes)
@@ -657,7 +672,7 @@ public class Editor: NSObject {
           error: error)
         isRecoveringFromError = true
         resetEditor(pendingEditorState: editorState)
-        try beginUpdate({}, mode: UpdateBehaviourModificationMode())
+          try beginUpdate({}, mode: UpdateBehaviourModificationMode(), reason: .errorRecovery)
         self.isUpdating = previouslyUpdating
         return
       }
@@ -695,7 +710,7 @@ public class Editor: NSObject {
     // These have to be outside of the above runWithStateLexicalScopeProperties{} closure, because: if any update block is triggered from inside that
     // closure, it counts as a nested update. But listeners, which happen after we've run the reconciler, should not count as nested for this purpose;
     // if an update is triggered from within an update listener, it needs to run the reconciler a second time.
-    try runWithStateLexicalScopeProperties(activeEditor: self, activeEditorState: pendingEditorState, readOnlyMode: true) {
+    try runWithStateLexicalScopeProperties(activeEditor: self, activeEditorState: pendingEditorState, readOnlyMode: true, editorUpdateReason: reason) {
       triggerUpdateListeners(activeEditor: self, activeEditorState: pendingEditorState, previousEditorState: previousEditorStateForListeners, dirtyNodes: dirtyNodesForListeners)
       try triggerTextContentListeners(activeEditor: self, activeEditorState: pendingEditorState, previousEditorState: previousEditorStateForListeners)
     }
@@ -719,15 +734,15 @@ public class Editor: NSObject {
   }
 
   private func beginRead(_ closure: () throws -> Void) throws {
-    try runWithStateLexicalScopeProperties(activeEditor: self, activeEditorState: getActiveEditorState() ?? editorState, readOnlyMode: true, closure: closure)
+    try runWithStateLexicalScopeProperties(activeEditor: self, activeEditorState: getActiveEditorState() ?? editorState, readOnlyMode: true, editorUpdateReason: nil, closure: closure)
   }
 
   // There are some cases (mainly related to non-controlled mode and/or UIKit's selection handling) where we
   // want to run an update but not to do everything that is done within an update block. This is definitely for
   // internal Lexical use only, and should only be done if safety can be guaranteed, i.e. the caller of
   // such an update must guarantee that the EditorState will not be left in an inconsistent state when they are finished.
-  internal func updateWithCustomBehaviour(mode: UpdateBehaviourModificationMode, _ closure: () throws -> Void) throws {
-    try beginUpdate(closure, mode: mode)
+  internal func updateWithCustomBehaviour(mode: UpdateBehaviourModificationMode, reason: EditorUpdateReason, _ closure: () throws -> Void) throws {
+      try beginUpdate(closure, mode: mode, reason: reason)
   }
 
   internal func normalizeAllDirtyTextNodes(editorState: EditorState) throws {
@@ -923,7 +938,7 @@ public class Editor: NSObject {
 
         try rootNode.append(serializedRootNode.getChildren())
         try rootNode.setDirection(direction: serializedRootNode.direction)
-      }, mode: UpdateBehaviourModificationMode(suppressReconcilingSelection: true, suppressSanityCheck: true, markedTextOperation: nil, skipTransforms: true, allowUpdateWithoutTextStorage: false))
+      }, mode: UpdateBehaviourModificationMode(suppressReconcilingSelection: true, suppressSanityCheck: true, markedTextOperation: nil, skipTransforms: true, allowUpdateWithoutTextStorage: false), reason: .parseState)
 
     return self.editorState
   }

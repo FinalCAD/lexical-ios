@@ -10,6 +10,18 @@ import UIKit
 
 public class RangeSelection: BaseSelection {
     
+    public class InsertNewAfterResult {
+        public let element: Node?
+        public let skipLineBreak: Bool
+        public let skipSelectStart: Bool
+        
+        public init(element: ElementNode? = nil, skipLineBreak: Bool = false, skipSelectStart: Bool = false) {
+            self.element = element
+            self.skipLineBreak = skipLineBreak
+            self.skipSelectStart = skipSelectStart
+        }
+    }
+    
     public var anchor: Point
     public var focus: Point
     public var dirty: Bool
@@ -321,10 +333,10 @@ public class RangeSelection: BaseSelection {
                 try prevSibling.select(anchorOffset: nil, focusOffset: nil)
                 firstNode = prevSibling
             }
-            if text.lengthAsNSString() > 0 {
-                try insertText(text)
-                return
-            }
+//            if text.lengthAsNSString() > 0 {
+//                try insertText(text)
+//                return
+//            }
         } else if firstNode.isSegmented() && startOffset != firstNodeTextLength {
             let textNode = TextNode(text: firstNode.getTextPart())
             try textNode.setFormat(format: format)
@@ -344,13 +356,29 @@ public class RangeSelection: BaseSelection {
                 try insertText(text)
                 return
             }
+            
+            // TODO: this is a hack around auto complete selecting the token node and swallowing the change. Need to figure out a cleaner way to integrate this logic.
+            if firstNode.isToken() && selectedNodesLength == 2 {
+                let textNode = TextNode(text: "")
+                try textNode.setFormat(format: format)
+                try textNode.select(anchorOffset: 0, focusOffset: 0)
+                try firstNode.insertAfter(nodeToInsert: textNode)
+                try lastNode?.remove()
+                
+                try insertText(text)
+                return
+            }
         }
         
         if selectedNodesLength == 1 {
             if firstNode.isToken() {
-                let textNode = TextNode(text: text)
-                try textNode.select(anchorOffset: nil, focusOffset: nil)
-                try firstNode.replace(replaceWith: textNode)
+                if text.lengthAsNSString() == 0 {
+                    try firstNode.remove()
+                } else {
+                    let textNode = TextNode(text: text)
+                    try textNode.select(anchorOffset: nil, focusOffset: nil)
+                    try firstNode.replace(replaceWith: textNode)
+                }
                 return
             }
             let firstNodeFormat = firstNode.getFormat()
@@ -417,7 +445,10 @@ public class RangeSelection: BaseSelection {
             }
             
             // Handle mutations to the last node.
-            if (endPoint.type == .text && (endOffset != 0 || (lastNode?.getTextContent().lengthAsNSString() == 0))) || (endPoint.type == .element && lastNode?.getIndexWithinParent() ?? 0 < endOffset) {
+            let shouldModifyTextNode = endPoint.type == .text && (endOffset != 0 || (lastNode?.getTextContent().lengthAsNSString() == 0))
+            let shouldModifyElementNode = endPoint.type == .element && (lastNode?.getIndexWithinParent() ?? 0 < endOffset)
+            
+            if (shouldModifyTextNode || shouldModifyElementNode) && !isDecoratorNode(lastNode) {
                 if let lastNodeAsTextNode = lastNode as? TextNode,
                    !lastNodeAsTextNode.isToken(),
                    endOffset != lastNodeAsTextNode.getTextContentSize()
@@ -453,7 +484,7 @@ public class RangeSelection: BaseSelection {
             // Either move the remaining nodes of the last parent to after
             // the first child, or remove them entirely. If the last parent
             // is the same as the first parent, this logic also works.
-            let lastNodeChildren = lastElement?.getChildren() ?? []
+            let lastElementChildren = lastElement?.getChildren() ?? []
             let selectedNodesSet = Set(selectedNodes)
             let firstAndLastElementsAreEqual = firstElement == lastElement
             
@@ -463,10 +494,18 @@ public class RangeSelection: BaseSelection {
             // we will incorrectly merge into the starting parent element.
             // TODO: should we keep on traversing parents if we're inside another
             // nested inline element?
-            let insertionTarget = firstElement.isInline() && firstNode.getNextSibling() == nil ? firstElement : firstNode
+            var insertionTarget = firstElement.isInline() && firstNode.getNextSibling() == nil ? firstElement : firstNode
             
-            for (_, lastNodeChild) in lastNodeChildren.enumerated().reversed() {
-                if lastNodeChild.isSameNode(firstNode) || ((lastNodeChild as? ElementNode)?.isParentOf(firstNode) ?? false) {
+            if isRootNode(node: lastElement) && isTextNode(insertionTarget) {
+                insertionTarget = try insertionTarget.getParentOrThrow()
+            }
+            
+            for (index, lastNodeChild) in lastElementChildren.enumerated().reversed() {
+                if lastNodeChild.isSameNode(firstNode) {
+                    break
+                }
+                
+                if let elementChild = lastNodeChild as? ElementNode, elementChild.isParentOf(firstNode) {
                     break
                 }
                 
@@ -551,9 +590,7 @@ public class RangeSelection: BaseSelection {
         var siblings: [Node] = []
         
         let nextSiblings = anchorNode.getNextSiblings()
-        guard let topLevelElement = try? anchorNode.getTopLevelElementOrThrow() else {
-            throw LexicalError.internal("Could not get top level element")
-        }
+        let topLevelElement = anchorNode.getTopLevelElement() ?? anchorNode
         
         if let anchorNode = anchorNode as? TextNode {
             let textContent = anchorNode.getTextPart()
@@ -644,7 +681,7 @@ public class RangeSelection: BaseSelection {
             didReplaceOrMerge = false
             
             if let unwrappedTarget = target as? ElementNode {
-                if let node = node as? DecoratorNode, node.isTopLevel() {
+                if let node = node as? DecoratorNode, !node.isInline() {
                     target = try target.insertAfter(nodeToInsert: node)
                 } else if !isElementNode(node: node) {
                     if let firstChild = unwrappedTarget.getFirstChild() {
@@ -663,7 +700,7 @@ public class RangeSelection: BaseSelection {
                         target = try target.insertAfter(nodeToInsert: node)
                     }
                 }
-            } else if !isElementNode(node: node) || isDecoratorNode(node) && (node as? DecoratorNode)?.isTopLevel() == true {
+            } else if !isElementNode(node: node) || isDecoratorBlockNode(node) {
                 target = try target.insertAfter(nodeToInsert: node)
             } else {
                 target = try node.getParentOrThrow() // Re-try again with the target being the parent
@@ -819,7 +856,8 @@ public class RangeSelection: BaseSelection {
         let nodesToMoveLength = nodesToMove.count
         if anchorOffset == 0 && nodesToMoveLength > 0 && currentElement.isInline() {
             let parent = try currentElement.getParentOrThrow()
-            let newElement = try parent.insertNewAfter(selection: self)
+            let result = try parent.insertNewAfter(selection: self)
+            let newElement = result.element
             if let newElement = newElement as? ElementNode {
                 let children = parent.getChildren()
                 for child in children {
@@ -829,10 +867,20 @@ public class RangeSelection: BaseSelection {
             return
         }
         
-        let newElement = try currentElement.insertNewAfter(selection: self)
+        let currentParent = try currentElement.getParentOrThrow()
+        let result = try currentElement.insertNewAfter(selection: self)
+        let newElement = result.element
         if newElement == nil {
-            // Handle as a line break insertion
-            try insertLineBreak(selectStart: false)
+            if !result.skipLineBreak {
+                // Handle as a line break insertion
+                try insertLineBreak(selectStart: false)
+            } else {
+                let paragraphNode = createParagraphNode()
+                let placeholderNode = PlaceholderNode()
+                try paragraphNode.append([placeholderNode])
+                try currentParent.insertAfter(nodeToInsert: paragraphNode)
+                try placeholderNode.select(anchorOffset: nil, focusOffset: nil)
+            }
         } else if let newElement = newElement as? ElementNode {
             // If we're at the beginning of the current element, move the new element to be before the current element
             let currentElementFirstChild = currentElement.getFirstChild()
@@ -868,7 +916,9 @@ public class RangeSelection: BaseSelection {
                 try newElement.selectPrevious(anchorOffset: nil, focusOffset: nil)
                 try newElement.remove()
             } else {
-                _ = try newElement.selectStart()
+                if !result.skipSelectStart {
+                    _ = try newElement.selectStart()
+                }
             }
         }
     }

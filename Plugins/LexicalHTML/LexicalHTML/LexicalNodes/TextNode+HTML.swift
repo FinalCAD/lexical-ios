@@ -151,6 +151,10 @@ extension Lexical.TextNode: NodeHTMLSupport {
     }
     
     public func exportDOM(editor: Lexical.Editor) throws -> DOMExportOutput {
+        if getTextPart().isEmpty || self is PlaceholderNode {
+            return (after: nil, element: nil)
+        }
+        
         var element: SwiftSoup.Node = SwiftSoup.TextNode(self.getTextPart(), nil)
         element = try wrapDomElement(element, with: "span")
         

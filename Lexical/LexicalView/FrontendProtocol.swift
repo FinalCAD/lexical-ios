@@ -39,4 +39,5 @@ internal protocol Frontend: AnyObject {
   func resetSelectedRange()
   func showPlaceholderText()
     func getTextView() -> TextView?
+    func resetTypingAttributes(for selectedNode: Node)
 }

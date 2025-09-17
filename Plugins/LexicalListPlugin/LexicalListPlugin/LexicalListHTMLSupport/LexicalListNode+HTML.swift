@@ -28,9 +28,9 @@ extension LexicalListPlugin.ListNode: @retroactive NodeHTMLSupport {
         
         switch element.tagName() {
         case "ol":
-            node = try createListNode(listType: .number, start: 1)
+            node = try createListNode(listType: .number, start: 1, withPlaceholders: true)
         case "ul":
-            node = try createListNode(listType: .bullet)
+            node = try createListNode(listType: .bullet, withPlaceholders: true)
         default:
             break
         }

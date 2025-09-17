@@ -124,22 +124,26 @@ private let activeEditorThreadDictionaryKey = "kActiveEditor"
 private let activeEditorStateThreadDictionaryKey = "kActiveEditorState"
 private let readOnlyModeThreadDictionaryKey = "kReadOnlyMode"
 private let previousParentUpdateBlocksThreadDictionaryKey = "kpreviousParentUpdateBlocks"
+private let editorUpdateReasonThreadDictionaryKey = "kEditorUpdateReason"
 
-internal func runWithStateLexicalScopeProperties(activeEditor: Editor?, activeEditorState: EditorState?, readOnlyMode: Bool, closure: () throws -> Void) throws {
+internal func runWithStateLexicalScopeProperties(activeEditor: Editor?, activeEditorState: EditorState?, readOnlyMode: Bool, editorUpdateReason: EditorUpdateReason?, closure: () throws -> Void) throws {
   let previousActiveEditor = Thread.current.threadDictionary[activeEditorThreadDictionaryKey]
   let previousActiveEditorState = Thread.current.threadDictionary[activeEditorStateThreadDictionaryKey]
   let previousReadOnly = Thread.current.threadDictionary[readOnlyModeThreadDictionaryKey]
   let previousParentUpdateBlocks: [Editor] = Thread.current.threadDictionary[previousParentUpdateBlocksThreadDictionaryKey] as? [Editor] ?? []
+    let previousEditorUpdateReason = Thread.current.threadDictionary[editorUpdateReasonThreadDictionaryKey]
 
   Thread.current.threadDictionary[activeEditorThreadDictionaryKey] = activeEditor
   Thread.current.threadDictionary[activeEditorStateThreadDictionaryKey] = activeEditorState
   Thread.current.threadDictionary[readOnlyModeThreadDictionaryKey] = readOnlyMode
+    Thread.current.threadDictionary[editorUpdateReasonThreadDictionaryKey] = editorUpdateReason
 
   defer {
     Thread.current.threadDictionary[activeEditorThreadDictionaryKey] = previousActiveEditor
     Thread.current.threadDictionary[activeEditorStateThreadDictionaryKey] = previousActiveEditorState
     Thread.current.threadDictionary[readOnlyModeThreadDictionaryKey] = previousReadOnly
     Thread.current.threadDictionary[previousParentUpdateBlocksThreadDictionaryKey] = previousParentUpdateBlocks
+      Thread.current.threadDictionary[editorUpdateReasonThreadDictionaryKey] = previousEditorUpdateReason
   }
 
   if let activeEditor, readOnlyMode == false {

@@ -122,7 +122,7 @@ public func createParagraphNode() -> ParagraphNode {
 }
 
 public func createHeadingNode(headingTag: HeadingTagType) -> HeadingNode {
-  HeadingNode(tag: headingTag)
+    HeadingNode(tag: headingTag)
 }
 
 public func createQuoteNode() -> QuoteNode {
@@ -203,6 +203,13 @@ public func isLineBreakNode(_ node: Node?) -> Bool {
 
 public func isDecoratorNode(_ node: Node?) -> Bool {
   node is DecoratorNode
+}
+
+public func isDecoratorBlockNode(_ node: Node?) -> Bool {
+    if let decoratorNode = node as? DecoratorNode {
+        return !decoratorNode.isInline()
+    }
+    return false
 }
 
 // TODO: - update function when we add LineBreakNode and DecoratorNode

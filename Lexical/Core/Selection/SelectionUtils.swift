@@ -568,6 +568,10 @@ public func setBlocksType(
         let targetElement = createElement()
         if let node = node as? ElementNode {
             _ = try? targetElement.setIndent(node.getIndent())
+            
+            if node.getChildrenSize() == 0 {
+                try? node.append([PlaceholderNode()])
+            }
         }
         _ = try? node.replace(replaceWith: targetElement, includeChildren: true)
     }
@@ -575,7 +579,7 @@ public func setBlocksType(
 
 private func isBlock(_ node: Node) -> Bool {
     guard let node = node as? ElementNode, !isRootNode(node: node) else {
-        return false
+        return !node.isInline()
     }
     
     let firstChild = node.getFirstChild()

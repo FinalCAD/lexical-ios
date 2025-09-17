@@ -101,12 +101,51 @@ open class DecoratorNode: Node {
     return false
   }
 
-  override public final func getPreamble() -> String {
-    guard let unicodeScalar = Unicode.Scalar(NSTextAttachment.character) else {
-      return ""
+    override open func getPreamble() -> String {
+        guard let unicodeScalar = Unicode.Scalar(NSTextAttachment.character) else {
+            return ""
+        }
+        return String(Character(unicodeScalar))
     }
-    return String(Character(unicodeScalar))
-  }
+    
+    override open func getPostamble() -> String {
+        return ""
+    }
+    
+    // TODO: I tried copying this from element node but it doesn't look like it's getting called
+    @discardableResult
+    public func select(anchorOffset: Int?, focusOffset: Int?) throws -> RangeSelection {
+        try errorOnReadOnly()
+        
+        let selection = try getSelection()
+        let childrenCount = 0
+        var updatedAnchorOffset = childrenCount
+        var updatedFocusOffset = childrenCount
+        
+        if let anchorOffset {
+            updatedAnchorOffset = anchorOffset
+        }
+        
+        if let focusOffset {
+            updatedFocusOffset = focusOffset
+        }
+        
+        guard let selection = selection as? RangeSelection else {
+            return try makeRangeSelection(
+                anchorKey: key,
+                anchorOffset: updatedAnchorOffset,
+                focusKey: key,
+                focusOffset: updatedFocusOffset,
+                anchorType: .element,
+                focusType: .element)
+        }
+        
+        selection.anchor.updatePoint(key: key, offset: updatedAnchorOffset, type: .element)
+        selection.focus.updatePoint(key: key, offset: updatedFocusOffset, type: .element)
+        selection.dirty = true
+        
+        return selection
+    }
 
   override public func getAttributedStringAttributes(theme: Theme) -> [NSAttributedString.Key: Any] {
     let textAttachment = TextAttachment()

@@ -298,6 +298,10 @@ internal class LexicalReadOnlySizeCache {
     context.restoreGState()
   }
     
+    func resetTypingAttributes(for selectedNode: Node) {
+        
+    }
+    
     func getTextView() -> TextView? {
         nil
     }

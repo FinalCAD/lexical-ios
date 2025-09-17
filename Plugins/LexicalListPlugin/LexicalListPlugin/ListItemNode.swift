@@ -40,6 +40,10 @@ public class ListItemNode: ElementNode {
     .listItem
   }
 
+    private func isOnlyPlaceholder() -> Bool {
+        return getChildrenSize() == 1 && getFirstChild() is PlaceholderNode
+    }
+    
   public func getValue() -> Int {
     let node = self.getLatest()
     return node.value
@@ -78,7 +82,7 @@ public class ListItemNode: ElementNode {
       try list.insertAfter(nodeToInsert: replaceWithNode)
     } else {
       // Split the list
-      let newList = try createListNode(listType: list.getListType())
+        let newList = try createListNode(listType: list.getListType(), withPlaceholders: list.withPlaceholders)
       var nextSibling = self.getNextSibling()
       while nextSibling != nil {
         guard let nodeToAppend = nextSibling else { continue }
@@ -112,10 +116,6 @@ public class ListItemNode: ElementNode {
         
       let afterListNode = try node.getParentOrThrow()
         
-//        if let itemNode = after as? ListItemNode {
-//            try itemNode.append([createTextNode(text: "toto")])
-//        }
-
       if let afterListNode = afterListNode as? ListNode {
         try updateChildrenListItemValue(list: afterListNode, children: nil)
       }
@@ -141,7 +141,7 @@ public class ListItemNode: ElementNode {
     _ = try listNode.insertAfter(nodeToInsert: node)
 
     if !siblings.isEmpty {
-      let newListNode = try createListNode(listType: listNode.getListType())
+        let newListNode = try createListNode(listType: listNode.getListType(), withPlaceholders: listNode.withPlaceholders)
       try newListNode.append(siblings)
       _ = try node.insertAfter(nodeToInsert: newListNode)
     }
@@ -172,15 +172,29 @@ public class ListItemNode: ElementNode {
     }
   }
 
-  override public func insertNewAfter(selection: RangeSelection?) throws -> Node? {
-    let newElement = ListItemNode()
-      let format = getFormat()
-      
-      try newElement.setFormat(format)
-    _ = try self.insertAfter(nodeToInsert: newElement)
-      
-    return newElement
-  }
+    override public func insertNewAfter(selection: RangeSelection?) throws -> RangeSelection.InsertNewAfterResult {
+        guard let listNode = try self.getParentOrThrow() as? ListNode else {
+            throw LexicalError.invariantViolation("list node is not parent of list item node")
+        }
+        
+        if isOnlyPlaceholder() {
+            try self.remove()
+            return .init(skipLineBreak: true)
+        }
+        
+        let newElement = ListItemNode()
+        if listNode.withPlaceholders {
+            let placeholder = PlaceholderNode()
+            try newElement.append([placeholder])
+            try placeholder.select(anchorOffset: nil, focusOffset: nil)
+        } else {
+            try newElement.select(anchorOffset: nil, focusOffset: nil)
+        }
+        
+        _ = try self.insertAfter(nodeToInsert: newElement)
+        
+        return .init(element: newElement, skipSelectStart: true)
+    }
 
   override public func collapseAtStart(selection: RangeSelection) throws -> Bool {
     let paragraph = createParagraphNode()

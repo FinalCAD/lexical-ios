@@ -38,15 +38,15 @@ public class QuoteNode: ElementNode {
 
   // MARK: - Mutation
 
-  override open func insertNewAfter(selection: RangeSelection?) throws -> Node? {
-    let newBlock = createParagraphNode()
-    let direction = getDirection()
-    try newBlock.setDirection(direction: direction)
-
-    try insertAfter(nodeToInsert: newBlock)
-
-    return newBlock
-  }
+    override open func insertNewAfter(selection: RangeSelection?) throws -> RangeSelection.InsertNewAfterResult {
+        let newBlock = createParagraphNode()
+        let direction = getDirection()
+        try newBlock.setDirection(direction: direction)
+        
+        try insertAfter(nodeToInsert: newBlock)
+        
+        return .init(element: newBlock)
+    }
 
   override public func collapseAtStart(selection: RangeSelection) throws -> Bool {
     let paragraph = createParagraphNode()

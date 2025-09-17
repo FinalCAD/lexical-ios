@@ -307,9 +307,9 @@ open class ElementNode: Node {
     return true
   }
 
-  open func isInline() -> Bool {
-    return false
-  }
+    open override func isInline() -> Bool {
+        return false
+    }
 
   func canSelectionRemove() -> Bool {
     return true
@@ -402,7 +402,7 @@ open class ElementNode: Node {
     return textNodes
   }
 
-  override public func getTextContent(includeInert: Bool = false, includeDirectionless: Bool = false) -> String {
+  override public func getTextContent(includeInert: Bool = false, includeDirectionless: Bool = false, maxLength: Int? = nil) -> String {
     let children = getChildren()
     let preamble = getPreamble()
     let postamble = getPostamble()
@@ -415,6 +415,10 @@ open class ElementNode: Node {
       if child is LineBreakNode {
         textContent += child.getPostamble()
       }
+        
+        if let maxLength, textContent.lengthAsNSString() >= maxLength {
+            return String(textContent.prefix(maxLength))
+        }
     }
 
     textContent += postamble
@@ -466,7 +470,7 @@ open class ElementNode: Node {
   }
 
   // These are intended to be extends for specific element heuristics.
-  open func insertNewAfter(selection: RangeSelection?) throws -> Node? {
+    open func insertNewAfter(selection: RangeSelection?) throws -> RangeSelection.InsertNewAfterResult {
     throw LexicalError.internal("Subclasses need to implement this method")
   }
 

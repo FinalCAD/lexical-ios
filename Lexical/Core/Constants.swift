@@ -24,6 +24,7 @@ public struct NodeType: Hashable, RawRepresentable {
   public static let linebreak = NodeType(rawValue: "linebreak")
   public static let code = NodeType(rawValue: "code")
   public static let codeHighlight = NodeType(rawValue: "code-highlight")
+  public static let placeholder = NodeType(rawValue: "placeholder")
 }
 
 public enum Mode: String, Codable {
@@ -31,6 +32,15 @@ public enum Mode: String, Codable {
   case token
   case segmented
   case inert
+}
+
+public enum EditorUpdateReason: String {
+    case update = "update"
+    case reset = "reset"
+    case parseState = "parseState"
+    case setState = "setState"
+    case errorRecovery = "errorRecovery"
+    case initialization = "initialization"
 }
 
 enum LexicalConstants {
@@ -103,6 +113,8 @@ public struct CommandType: RawRepresentable, Hashable {
   }
 
   public static let selectionChange = CommandType(rawValue: "selectionChange")
+    public static let beginEditing = CommandType(rawValue: "beginEditing")
+    public static let endEditing = CommandType(rawValue: "endEditing")
   public static let click = CommandType(rawValue: "click")
   public static let deleteCharacter = CommandType(rawValue: "deleteCharacter")
   public static let insertLineBreak = CommandType(rawValue: "insertLineBreak")

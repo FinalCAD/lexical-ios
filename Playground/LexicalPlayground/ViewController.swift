@@ -34,7 +34,7 @@ class ViewController: UIViewController, UIToolbarDelegate {
         let hierarchyPlugin = NodeHierarchyViewPlugin()
         let hierarchyView = hierarchyPlugin.hierarchyView
         
-        let listPlugin = ListPlugin()
+        let listPlugin = ListPlugin(withPlaceholders: true)
         let imagePlugin = InlineImagePlugin()
         let htmlPlugin = HTMLPlugin()
         
@@ -64,7 +64,11 @@ class ViewController: UIViewController, UIToolbarDelegate {
                 autolinkPlugin
             ]
         )
-        let lexicalView = LexicalView(editorConfig: editorConfig, featureFlags: FeatureFlags())
+        let lexicalView = LexicalView(
+            editorConfig: editorConfig,
+            featureFlags: FeatureFlags(),
+            placeholderText:LexicalPlaceholderText(text: "Placeholder", font: .systemFont(ofSize: 15), color: .placeholderText)
+        )
         
         linkPlugin.lexicalView = lexicalView
         
@@ -74,7 +78,7 @@ class ViewController: UIViewController, UIToolbarDelegate {
         
 //        self.restoreEditorState()
         
-        self.importHtml()
+//        self.importHtml()
         
         
         view.addSubview(lexicalView)
@@ -83,6 +87,8 @@ class ViewController: UIViewController, UIToolbarDelegate {
         
         navigationItem.title = "Lexical"
         setUpExportMenu()
+        
+        lexicalView.textView.becomeFirstResponder()
         
         let removeUpdateListener = lexicalView.editor.registerUpdateListener(listener: { activeEditorState, previousEditorState,dirtyNodes in
             // turn the editor state into stringified JSON
@@ -146,22 +152,25 @@ class ViewController: UIViewController, UIToolbarDelegate {
 //<p><span style="color: rgb(65, 117, 5); white-space: pre-wrap;">he playground</span><span style="background-color: rgb(126, 211, 33); white-space: pre-wrap;"> is a demo environm</span></p>
 //"""
         
-        let html = """
-<h1><span>Welcome to the playground</span></h1><blockquote><span>In case you were wondering what the black box at the bottom is – it's the debug view, showing the current state of the editor. You can disable it by pressing on the settings control in the bottom-left of your screen and toggling the debug view setting.</span></blockquote><p style="text-align:center"><span>The playground is a demo environment built with</span><code spellcheck="false"><span>@lexical/react</span></code><span>. Try typing in</span><b><strong>some text</strong></b><span style="background-color:#b8e986;color:#4a4a4a;">with</span><i><em>different</em></i><span>formats.</span></p><p><span>Make sure to check out the various plugins in the toolbar. You can also use</span><span>#hashtags</span><span>or @-mentions too!</span></p><p><span>If you'd like to find out more about Lexical, you can:</span></p><ul><li value="1" style="--listitem-marker-color:#4a4a4a;text-align:right"><span style="color:#4a4a4a;">Vi</span><span style="background-color:#b8e986;color:#4a4a4a;">sit the</span><a href="https://lexical.dev/"><span style="background-color:#b8e986;color:#4a4a4a;">Lexical website</span></a><span style="background-color:#b8e986;color:#4a4a4a;">for documentatio</span><span style="color:#4a4a4a;">n and more information.</span></li><li value="2"><span>Check out the code on our</span><a href="https://github.com/facebook/lexical"><span>GitHub repository</span></a><span>.</span></li><li value="3"><span>Playground code can be found</span><a href="https://github.com/facebook/lexical/tree/main/packages/lexical-playground"><span>here</span></a><span>.</span></li><li value="4" style="text-align:right"><span>Join our</span><a href="https://discord.com/invite/KmG4wQnnD9"><span>Discord Server</span></a><span>and chat with the team.</span></li><li value="5"><ul><li value="1"><span>awddwadwa</span></li></ul></li></ul><p><br></p><ol><li value="1"><span>awdwaddaw</span></li><li value="2" style="text-align:right"><span>awdwad</span></li><li value="2"><span>awdwad</span></li><li value="3"><ol><li value="1"><span>awdawd</span></li><li value="2"><ol l3"><li value="1"><span>wadawdaw</span></li></ol></li></ol></li></ol><p><span>Lastly, we're constantly adding cool new features to this playground. So make sure you check back here when you next get a chance</span><span><span>🙂</span></span><span>.</span></p>
-"""
+//        let html = """
+//<h1><span>Welcome to the playground</span></h1><blockquote><span>In case you were wondering what the black box at the bottom is – it's the debug view, showing the current state of the editor. You can disable it by pressing on the settings control in the bottom-left of your screen and toggling the debug view setting.</span></blockquote><p style="text-align:center"><span>The playground is a demo environment built with</span><code spellcheck="false"><span>@lexical/react</span></code><span>. Try typing in</span><b><strong>some text</strong></b><span style="background-color:#b8e986;color:#4a4a4a;">with</span><i><em>different</em></i><span>formats.</span></p><p><span>Make sure to check out the various plugins in the toolbar. You can also use</span><span>#hashtags</span><span>or @-mentions too!</span></p><p><span>If you'd like to find out more about Lexical, you can:</span></p><ul><li value="1" style="--listitem-marker-color:#4a4a4a;text-align:right"><span style="color:#4a4a4a;">Vi</span><span style="background-color:#b8e986;color:#4a4a4a;">sit the</span><a href="https://lexical.dev/"><span style="background-color:#b8e986;color:#4a4a4a;">Lexical website</span></a><span style="background-color:#b8e986;color:#4a4a4a;">for documentatio</span><span style="color:#4a4a4a;">n and more information.</span></li><li value="2"><span>Check out the code on our</span><a href="https://github.com/facebook/lexical"><span>GitHub repository</span></a><span>.</span></li><li value="3"><span>Playground code can be found</span><a href="https://github.com/facebook/lexical/tree/main/packages/lexical-playground"><span>here</span></a><span>.</span></li><li value="4" style="text-align:right"><span>Join our</span><a href="https://discord.com/invite/KmG4wQnnD9"><span>Discord Server</span></a><span>and chat with the team.</span></li><li value="5"><ul><li value="1"><span>awddwadwa</span></li></ul></li></ul><p><br></p><ol><li value="1"><span>awdwaddaw</span></li><li value="2" style="text-align:right"><span>awdwad</span></li><li value="2"><span>awdwad</span></li><li value="3"><ol><li value="1"><span>awdawd</span></li><li value="2"><ol l3"><li value="1"><span>wadawdaw</span></li></ol></li></ol></li></ol><p><span>Lastly, we're constantly adding cool new features to this playground. So make sure you check back here when you next get a chance</span><span><span>🙂</span></span><span>.</span></p>
+//"""
         
 //        let html = """
-//            <p><span></span></p>
-//            <ol><li><span>toto</span></li><li><span></span></li></ol>
+//            <ul><li value="1" dir="ltr">Liste à puces 1</li><li value="2" dir="ltr"><ul><li value="1" dir="ltr">Sous liste 1</li><li value="2" dir="ltr"><ul><li value="1" dir="ltr">Sous liste 2</li></ul></li></ul></li></ul><ol><li value="1" dir="ltr">Liste numérotée 1</li><li value="2" dir="ltr"><ol><li value="1" dir="ltr">Sous-liste 1</li><li value="2" dir="ltr"><ol><li value="1" dir="ltr">Sous-liste 2</li></ol></li></ol></li></ol>
 //            """
         
-        guard let body: Document = try? SwiftSoup.parse(html.replacingOccurrences(of: "\n", with: "")) else {
-            return
-        }
+      let html = """
+          <h1></h1>
+          """
 
         
         do {
             try editor.update {
+                guard let body: Document = try? SwiftSoup.parse(html.replacingOccurrences(of: "\n", with: "")) else {
+                    return
+                }
+                
                 let nodes = try generateNodesFromDOM(editor: editor, dom: body)
                 
                 let editorState = editor.getEditorState()
@@ -176,6 +185,8 @@ class ViewController: UIViewController, UIToolbarDelegate {
                 if try selection.insertNodes(nodes: nodes, selectStart: false) == false {
                     print("NOT INSERT NODES")
                 }
+                
+//                lexicalView?.textView.resetTypingAttributes(for: <#T##NSRange#>)
             }
             
 //            // turn the JSON back into a new editor state

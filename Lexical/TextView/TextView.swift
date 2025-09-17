@@ -34,7 +34,7 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
   private let useInputDelegateProxy: Bool
   private let inputDelegateProxy: InputDelegateProxy
 
-  fileprivate var textViewDelegate: TextViewDelegate = TextViewDelegate()
+  fileprivate var textViewDelegate: TextViewDelegate
 
   // MARK: - Init
 
@@ -64,6 +64,7 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
 
     useInputDelegateProxy = featureFlags.proxyTextViewInputDelegate
     inputDelegateProxy = InputDelegateProxy()
+      textViewDelegate = TextViewDelegate(editor: editor)
 
     super.init(frame: .zero, textContainer: textContainer)
 
@@ -139,7 +140,38 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
         inputDelegateProxy.sendSelectionChangedIgnoringSuspended(self)
       }
     }
+      
+      resetTypingAttributes(for: selectedRange)
   }
+    
+    public func resetTypingAttributes(for selectedRange: NSRange) {
+        do {
+            try editor.read {
+                guard let editor = getActiveEditor(),
+                      let point = try pointAtStringLocation(
+                        selectedRange.location,
+                        searchDirection: .forward,
+                        rangeCache: editor.rangeCache)
+                else {
+                    return
+                }
+                
+                let node = try point.getNode()
+                resetTypingAttributes(for: node)
+            }
+        } catch {
+            print("Failed resetting typing attributes: \(error)")
+        }
+    }
+    
+    public func resetTypingAttributes(for selectedNode: Node) {
+        let attributes = AttributeUtils.attributedStringStyles(
+            from: selectedNode,
+            state: editor.getEditorState(),
+            theme: editor.getTheme()
+        )
+        typingAttributes = attributes
+    }
 
   override public func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
     if action == #selector(paste(_:)) {
@@ -345,7 +377,7 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
     editor.dispatchCommand(type: .clearEditor)
   }
 
-  func setPlaceholderText(_ text: String, textColor: UIColor, font: UIFont) {
+  public func setPlaceholderText(_ text: String, textColor: UIColor, font: UIFont) {
     placeholderLabel.text = text
     placeholderLabel.textColor = textColor
     placeholderLabel.font = font
@@ -358,18 +390,33 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
     var shouldShow = false
     do {
       try editor.read {
-        guard let root = getRoot() else { return }
-        shouldShow = root.getTextContentSize() == 0
+          guard let root = getRoot() else { return }
+          
+          if root.getTextContentSize() == 0 {
+              shouldShow = true
+              return
+          }
+          
+          let paragraphNode = root.getFirstChild() as? ParagraphNode
+          
+          
+          if paragraphNode?.getChildrenSize() == 0 ||
+                (paragraphNode?.getChildrenSize() == 1 && paragraphNode?.getFirstChild<PlaceholderNode>() != nil) {
+              shouldShow = true
+              return
+          }
+          
+          shouldShow = false
       }
       if !shouldShow {
         hidePlaceholderLabel()
         return
       }
       try editor.read {
-        if canShowPlaceholder(isComposing: editor.isComposing()) {
+//        if canShowPlaceholder(isComposing: editor.isComposing()) {
           placeholderLabel.isHidden = false
           layoutIfNeeded()
-        }
+//        }
       }
     } catch {}
   }
@@ -398,6 +445,12 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
 }
 
 private class TextViewDelegate: NSObject, UITextViewDelegate {
+    private var editor: Editor
+    
+    init(editor: Editor) {
+        self.editor = editor
+    }
+    
   public func textViewDidChangeSelection(_ textView: UITextView) {
     guard let textView = textView as? TextView else { return }
 
@@ -427,11 +480,16 @@ private class TextViewDelegate: NSObject, UITextViewDelegate {
 
   public func textViewDidBeginEditing(_ textView: UITextView) {
     guard let textView = textView as? TextView else { return }
+      
+      editor.dispatchCommand(type: .beginEditing)
     textView.lexicalDelegate?.textViewDidBeginEditing(textView: textView)
   }
 
   public func textViewDidEndEditing(_ textView: UITextView) {
     guard let textView = textView as? TextView else { return }
+      
+      editor.dispatchCommand(type: .endEditing)
+      textView.showPlaceholderText()
     textView.lexicalDelegate?.textViewDidEndEditing(textView: textView)
   }
 

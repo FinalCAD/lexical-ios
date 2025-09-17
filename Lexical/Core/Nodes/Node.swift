@@ -73,6 +73,10 @@ open class Node: Codable {
       Self.getType()
     }
   }
+    
+    open func isInline() -> Bool {
+        return true
+    }
 
   /// Provides the **preamble** part of the node's content. Typically the preamble is used for control characters to represent embedded objects (see ``DecoratorNode``).
   ///
@@ -511,7 +515,7 @@ open class Node: Codable {
   /// Returns the text content of the node, typically including its children.
   ///
   /// This is different from ``getTextPart()``, which just returns the text provided by this node.
-  public func getTextContent(includeInert: Bool = false, includeDirectionless: Bool = false) -> String {
+  public func getTextContent(includeInert: Bool = false, includeDirectionless: Bool = false, maxLength: Int? = nil) -> String {
     return ""
   }
 
@@ -716,7 +720,11 @@ open class Node: Codable {
     internallyMarkSiblingsAsDirty(node: writableReplaceWith, status: .userInitiated)
 
     if includeChildren, let writableReplaceWith = writableReplaceWith as? ElementNode, let selfElement = self as? ElementNode {
-      try writableReplaceWith.append(selfElement.getChildren())
+//        if selfElement.getChildrenSize() == 0 {
+//            try writableReplaceWith.append([PlaceholderNode()])
+//        } else {
+            try writableReplaceWith.append(selfElement.getChildren())
+//        }
     }
 
     if let selection = try getSelection() as? RangeSelection { // TODO: the logic here differs from web. Web clones the selection further up. Should make iOS match.
@@ -770,6 +778,9 @@ open class Node: Codable {
     if let nextSibling = nextSibling as? ElementNode {
       return try nextSibling.select(anchorOffset: 0, focusOffset: 0)
     } else if let nextSibling = nextSibling as? TextNode {
+        return try nextSibling.select(anchorOffset: anchorOffset, focusOffset: focusOffset)
+    } else if let nextSibling = nextSibling as? DecoratorNode {
+      print("select next: \(nextSibling)")
       return try nextSibling.select(anchorOffset: anchorOffset, focusOffset: focusOffset)
     } else {
       let index = nextSibling?.getIndexWithinParent()

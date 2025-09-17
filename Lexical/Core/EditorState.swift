@@ -48,7 +48,7 @@ public class EditorState: NSObject {
     closure: () throws -> V
   ) throws -> V {
     var result: V?
-    try runWithStateLexicalScopeProperties(activeEditor: nil, activeEditorState: activeEditorState, readOnlyMode: true) {
+    try runWithStateLexicalScopeProperties(activeEditor: nil, activeEditorState: activeEditorState, readOnlyMode: true, editorUpdateReason: nil) {
       result = try closure()
     }
     guard let result else {
@@ -71,15 +71,7 @@ public class EditorState: NSObject {
   }
 
   public static func == (lhs: EditorState, rhs: EditorState) -> Bool {
-    if lhs.nodeMap.count != rhs.nodeMap.count {
-      return false
-    }
-
-    var isEqual = true
-
-    rhs.nodeMap.forEach { element in
-      isEqual = isEqual && (lhs.nodeMap[element.key] == element.value)
-    }
+      let isEqual = lhs.hasSameState(as: rhs)
 
     let selectionEqual: Bool
     if let lhsSelection = lhs.selection, let rhsSelection = rhs.selection {
@@ -92,6 +84,22 @@ public class EditorState: NSObject {
 
     return isEqual && selectionEqual
   }
+    
+    public func hasSameState(as rhs: EditorState) -> Bool {
+        if nodeMap.count != rhs.nodeMap.count {
+            return false
+        }
+        
+        var isEqual = true
+        for element in rhs.nodeMap {
+            isEqual = nodeMap[element.key] == element.value
+            if !isEqual {
+                break
+            }
+        }
+        
+        return isEqual
+    }
 
   static func createEmptyEditorState() -> EditorState {
     EditorState()
