@@ -58,6 +58,11 @@ enum AttributeUtils {
     if let bold = combinedAttributes[.bold] as? Bool {
       if bold {
         symbolicTraits = symbolicTraits.union([.traitBold])
+          if let boldFont = combinedAttributes[.boldFont] as? UIFont {
+              font = boldFont
+              fontDescriptor = boldFont.fontDescriptor
+          }
+          
       } else {
         symbolicTraits = symbolicTraits.remove(.traitBold) ?? symbolicTraits
       }
@@ -66,6 +71,11 @@ enum AttributeUtils {
     if let italic = combinedAttributes[.italic] as? Bool {
       if italic {
         symbolicTraits = symbolicTraits.union([.traitItalic])
+          if let italicFont = combinedAttributes[.italicFont] as? UIFont {
+              font = italicFont
+              fontDescriptor = italicFont.fontDescriptor
+          }
+          
       } else {
         symbolicTraits = symbolicTraits.remove(.traitItalic) ?? symbolicTraits
       }

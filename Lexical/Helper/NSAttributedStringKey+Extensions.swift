@@ -11,7 +11,9 @@ extension NSAttributedString.Key {
     public static let fontFamily: NSAttributedString.Key = .init(rawValue: "fontFamily")
     public static let fontSize: NSAttributedString.Key = .init(rawValue: "fontSize")
     public static let bold: NSAttributedString.Key = .init(rawValue: "bold")
+    public static let boldFont: NSAttributedString.Key = .init(rawValue: "boldFont")
     public static let italic: NSAttributedString.Key = .init(rawValue: "italic")
+    public static let italicFont: NSAttributedString.Key = .init(rawValue: "italicFont")
     // uppercase or lowercase
     public static let textTransform: NSAttributedString.Key = .init(rawValue: "textTransform")
     public static let paddingHead: NSAttributedString.Key = .init(rawValue: "paddingHead")
