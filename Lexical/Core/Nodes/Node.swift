@@ -687,6 +687,8 @@ open class Node: Codable {
   @discardableResult
   open func replace<T: Node>(replaceWith: T, includeChildren: Bool = false) throws -> T {
     try errorOnReadOnly()
+      let selection = try getSelection()?.clone()
+      
     let toReplaceKey = key
     let writableReplaceWith = try replaceWith.getWritable() as T
 
@@ -727,7 +729,7 @@ open class Node: Codable {
 //        }
     }
 
-    if let selection = try getSelection() as? RangeSelection { // TODO: the logic here differs from web. Web clones the selection further up. Should make iOS match.
+      if let selection = selection as? RangeSelection { // TODO: the logic here differs from web. Web clones the selection further up. Should make iOS match.
       let anchor = selection.anchor
       let focus = selection.focus
 
