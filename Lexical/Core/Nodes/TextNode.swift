@@ -194,19 +194,19 @@ public struct TextNodeStyle: Equatable, Codable {
     
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(foregroundColor?.hex, forKey: .foregroundColor)
-        try container.encode(foregroundColor?.hex, forKey: .backgroundColor)
+        try container.encode(foregroundColor?.rgba, forKey: .foregroundColor)
+        try container.encode(foregroundColor?.rgba, forKey: .backgroundColor)
     }
     
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        if let foregroundColor = try container.decodeIfPresent(UInt.self, forKey: .foregroundColor) {
-            self.foregroundColor = UIColor(hex: foregroundColor)
+        if let foregroundColor = try container.decodeIfPresent(String.self, forKey: .foregroundColor) {
+            self.foregroundColor = UIColor(rgb: foregroundColor)
         }
         
-        if let backgroundColor = try container.decodeIfPresent(UInt.self, forKey: .backgroundColor) {
-            self.backgroundColor = UIColor(hex: backgroundColor)
+        if let backgroundColor = try container.decodeIfPresent(String.self, forKey: .backgroundColor) {
+            self.backgroundColor = UIColor(rgb: backgroundColor)
         }
     }
     
