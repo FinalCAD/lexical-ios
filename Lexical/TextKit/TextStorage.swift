@@ -76,7 +76,7 @@ public class TextStorage: NSTextStorage {
     edited(.editedCharacters, range: range, changeInLength: (str as NSString).length - range.length)
     endEditing()
       guard let editor, let frontend = editor.frontend else { return }
-      frontend.showPlaceholderText()
+//      frontend.showPlaceholderText()
   }
 
   private func performControllerModeUpdate(_ str: String, range: NSRange) {
@@ -114,7 +114,7 @@ public class TextStorage: NSTextStorage {
         frontend.interceptNextSelectionChangeAndReplaceWithRange = updatedNativeSelection.range
       }
 
-      frontend.showPlaceholderText()
+//      frontend.showPlaceholderText()
     } catch {
       print("\(error)")
     }

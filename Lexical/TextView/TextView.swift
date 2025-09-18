@@ -388,35 +388,35 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
 
   func showPlaceholderText() {
     var shouldShow = false
-    do {
-      try editor.read {
-          guard let root = getRoot() else { return }
-          
-          if root.getTextContentSize() == 0 {
-              shouldShow = true
-              return
-          }
-          
-          
-          if root.getChildrenSize() == 0 ||
-                (root.getChildrenSize() == 1 && root.getFirstChild() is PlaceholderNode) {
-              shouldShow = true
-              return
-          }
-          
-          shouldShow = false
-      }
-      if !shouldShow {
-        hidePlaceholderLabel()
-        return
-      }
-      try editor.read {
-//        if canShowPlaceholder(isComposing: editor.isComposing()) {
-          placeholderLabel.isHidden = false
-          layoutIfNeeded()
-//        }
-      }
-    } catch {}
+//    do {
+//      try editor.read {
+//          guard let root = getRoot() else { return }
+//          
+//          if root.getTextContentSize() == 0 {
+//              shouldShow = true
+//              return
+//          }
+//          
+//          
+//          if root.getChildrenSize() == 0 ||
+//                (root.getChildrenSize() == 1 && root.getFirstChild() is PlaceholderNode) {
+//              shouldShow = true
+//              return
+//          }
+//          
+//          shouldShow = false
+//      }
+//      if !shouldShow {
+//        hidePlaceholderLabel()
+//        return
+//      }
+//      try editor.read {
+////        if canShowPlaceholder(isComposing: editor.isComposing()) {
+//          placeholderLabel.isHidden = false
+//          layoutIfNeeded()
+////        }
+//      }
+//    } catch {}
   }
 
   // MARK: - Private
