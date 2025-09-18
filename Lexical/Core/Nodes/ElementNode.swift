@@ -32,6 +32,23 @@ public enum ElementFormatType: String, CaseIterable, Decodable {
             return .justified
         }
     }
+    
+    public init(from alignement: NSTextAlignment) {
+        switch alignement {
+        case .left:
+            self = .left
+        case .center:
+            self = .center
+        case .right:
+            self = .right
+        case .justified:
+            self = .justify
+        case .natural:
+            self = .left
+        @unknown default:
+            self = .left
+        }
+    }
 }
 
 open class ElementNode: Node {

@@ -138,7 +138,7 @@ extension Lexical.TextNode: NodeHTMLSupport {
                 return node
             }
             
-            let _ = try textNode.setStyle(style)
+            let _ = try textNode.getLatest().applyPatch(style.get)
             
             if shouldApply != nil {
                 var textFormat = textNode.getFormat()

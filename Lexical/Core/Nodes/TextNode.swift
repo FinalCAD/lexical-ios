@@ -238,6 +238,20 @@ public struct TextNodeStyle: Equatable, Codable {
             }
         }
     }
+    
+    public var get: [PartialKeyPath<TextNodeStyle>: Any] {
+        var patch: [PartialKeyPath<TextNodeStyle>: Any] = [:]
+        
+        if let foregroundColor {
+            patch[\.foregroundColor] = foregroundColor
+        }
+        
+        if let backgroundColor {
+            patch[\.backgroundColor] = backgroundColor
+        }
+        
+        return patch
+    }
 }
 
 open class TextNode: Node {

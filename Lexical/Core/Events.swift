@@ -417,7 +417,10 @@ public func registerRichText(editor: Editor) {
           },
           indentOrOutdent: { elementNode in
             let indent = elementNode.getIndent()
-            if indent != 10 {
+              let width = editor.getTextView()?.bounds.width ?? 0
+              let maxWidth = width - 100
+              
+              if CGFloat(indent) * editor.getTheme().indentSize < maxWidth {
               _ = try? elementNode.setIndent(indent + 1)
             }
           })
