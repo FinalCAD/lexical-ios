@@ -17,8 +17,8 @@ extension Lexical.TextNodeStyle {
                 let temp = $1.split(separator: ":")
                 
                 if temp.first != nil {
-                    let key = String(temp.first!)
-                    let value = String(temp.last!)
+                    let key = String(temp.first!).trim()
+                    let value = String(temp.last!).trim()
                     
                     switch key {
                     case "background-color":
@@ -38,11 +38,11 @@ extension Lexical.TextNodeStyle {
         var properties : [String:String] = [:]
         
         if let backgroundColor {
-            properties["background-color"] = String(format: "#%06X", backgroundColor.hex)
+            properties["background-color"] = backgroundColor.rgba
         }
         
         if let foregroundColor {
-            properties["color"] = String(format: "#%06X", foregroundColor.hex)
+            properties["color"] = foregroundColor.rgba
         }
         
         if properties.isEmpty {

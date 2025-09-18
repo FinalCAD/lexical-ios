@@ -12,6 +12,19 @@ extension UIColor {
         return (red << 16) | (green << 8) | blue
     }
     
+    public var rgba: String {
+        let red = Int((coreImageColor.red * 255.0).rounded())
+        let green = Int((coreImageColor.green * 255.0).rounded())
+        let blue = Int((coreImageColor.blue * 255.0).rounded())
+        let alpha = coreImageColor.alpha
+        
+        if alpha < 1.0 {
+            return String(format: "rgba(%d, %d, %d, %.2f)", red, green, blue, alpha)
+        } else {
+            return String(format: "rgb(%d, %d, %d)", red, green, blue)
+        }
+    }
+    
     public convenience init(hex: UInt) {
         let red = (hex >> 16) & 0xFF
         let green = (hex >> 8) & 0xFF
