@@ -131,8 +131,8 @@ public class TextStorage: NSTextStorage {
     edited(.editedAttributes, range: range, changeInLength: 0)
     endEditing()
       
-      guard let editor, let frontend = editor.frontend else { return }
-      frontend.showPlaceholderText()
+//      guard let editor, let frontend = editor.frontend else { return }
+//      frontend.showPlaceholderText()
   }
 
   public var extraLineFragmentAttributes: [NSAttributedString.Key: Any]? {
