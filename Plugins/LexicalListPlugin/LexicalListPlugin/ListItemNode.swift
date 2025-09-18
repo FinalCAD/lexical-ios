@@ -55,7 +55,11 @@ public class ListItemNode: ElementNode {
   }
 
   override public func append(_ nodesToAppend: [Node]) throws {
-    for node in nodesToAppend {
+      if isOnlyPlaceholder() {
+          try self.getFirstChild()?.remove()
+      }
+      
+      for node in nodesToAppend {
       if let node = node as? ElementNode, self.canMergeWith(node: node) {
         let children = node.getChildren()
           try setFormat(node.getFormat())
@@ -65,6 +69,11 @@ public class ListItemNode: ElementNode {
         try super.append([node])
       }
     }
+//      
+//      // If we've appended nodes and the list item is now empty, add the placeholder
+//      if self.getChildrenSize() == 0 {
+//          try super.append([PlaceholderNode()])
+//      }
   }
 
   override public func replace<T>(replaceWith replaceWithNode: T, includeChildren: Bool = false) throws -> T where T: Node {
@@ -178,8 +187,17 @@ public class ListItemNode: ElementNode {
         }
         
         if isOnlyPlaceholder() {
-            try self.remove()
-            return .init(skipLineBreak: true)
+            if listNode.getParent() is ListItemNode {
+//                try listNode.getLastChild()?.remove()
+                try self.selectPrevious(anchorOffset: nil, focusOffset: nil)
+                
+                try handleOutdent(self)
+                return .init(element: self, skipLineBreak: true, skipSelectStart: false)
+            } else {
+                try self.remove()
+                return .init(skipLineBreak: true)
+            }
+            
         }
         
         let newElement = ListItemNode()
@@ -197,6 +215,12 @@ public class ListItemNode: ElementNode {
     }
 
   override public func collapseAtStart(selection: RangeSelection) throws -> Bool {
+      // If this node only contains the placeholder, remove it and the list item
+      if isOnlyPlaceholder() {
+          try self.remove()
+          return true
+      }
+      
     let paragraph = createParagraphNode()
     let children = self.getChildren()
     try paragraph.append(children)

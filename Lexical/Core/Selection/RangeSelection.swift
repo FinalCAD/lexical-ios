@@ -306,6 +306,10 @@ public class RangeSelection: BaseSelection {
                         try firstNode.insertAfter(nodeToInsert: nextSibling)
                     }
                 }
+                
+                if firstNode is PlaceholderNode {
+                    try firstNode.remove()
+                }
             }
             if let nextSibling {
                 try nextSibling.select(anchorOffset: 0, focusOffset: 0)
@@ -326,6 +330,10 @@ public class RangeSelection: BaseSelection {
                         try firstNodeParent.insertBefore(nodeToInsert: prevSibling)
                     } else {
                         try firstNode.insertBefore(nodeToInsert: prevSibling)
+                        
+                        if firstNode is PlaceholderNode {
+                            try firstNode.remove()
+                        }
                     }
                 }
             }

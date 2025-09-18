@@ -44,6 +44,14 @@ public class ListNode: ElementNode {
   override public class func getType() -> NodeType {
     return .list
   }
+    
+    override public func getAttributedStringAttributes(theme: Theme) -> [NSAttributedString.Key: Any] {
+        if let paragraph = theme.paragraph {
+            return paragraph
+        }
+        
+        return [:]
+    }
 
   // MARK: getters/setters
 

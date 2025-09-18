@@ -130,7 +130,7 @@ public class ToolbarPlugin: NSObject, Plugin {
         let styling = UIBarButtonItem(image: UIImage(systemName: "bold.italic.underline"), menu: self.stylingMenu)
         self.stylingButton = styling
         
-        let alignment = UIBarButtonItem(title: "Text Alignment", menu: self.textAlignmentMenu)
+        let alignment = UIBarButtonItem(title: "Align", menu: self.textAlignmentMenu)
         self.textAlignmentButton = alignment
         
         let link = UIBarButtonItem(

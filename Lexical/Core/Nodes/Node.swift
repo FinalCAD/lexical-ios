@@ -661,6 +661,8 @@ open class Node: Codable {
     writableNodeToInsert.parent = writableSelf.parent
     let children = writableParent.children
     let index = children.firstIndex(of: writableSelf.key)
+      
+      
 
     if let index {
       writableParent.children.insert(insertKey, at: index)
@@ -687,7 +689,7 @@ open class Node: Codable {
   @discardableResult
   open func replace<T: Node>(replaceWith: T, includeChildren: Bool = false) throws -> T {
     try errorOnReadOnly()
-      let selection = try getSelection()?.clone()
+      let copiedSelection = try getSelection()?.clone()
       
     let toReplaceKey = key
     let writableReplaceWith = try replaceWith.getWritable() as T
@@ -726,10 +728,11 @@ open class Node: Codable {
 //            try writableReplaceWith.append([PlaceholderNode()])
 //        } else {
             try writableReplaceWith.append(selfElement.getChildren())
+        try selfElement.select(anchorOffset: nil, focusOffset: nil)
 //        }
     }
 
-      if let selection = selection as? RangeSelection { // TODO: the logic here differs from web. Web clones the selection further up. Should make iOS match.
+      if let selection = try getSelection() as? RangeSelection { // TODO: the logic here differs from web. Web clones the selection further up. Should make iOS match.
       let anchor = selection.anchor
       let focus = selection.focus
 
@@ -740,6 +743,28 @@ open class Node: Codable {
       if focus.key == toReplaceKey {
         moveSelectionPointToEnd(point: focus, node: writableReplaceWith)
       }
+          
+          if let copiedSelection = copiedSelection as? RangeSelection {
+//              selection.anchor.updatePoint(
+//                key: selection.anchor.key,
+//                offset: copiedSelection.anchor.offset,
+//                type: selection.anchor.type
+//              )
+//              
+//              selection.focus.updatePoint(
+//                key: selection.focus.key,
+//                offset: copiedSelection.focus.offset,
+//                type: selection.focus.type
+//              )
+              
+              // Cherche le premier TextNode descendant pour y placer la sélection
+              if let element = writableReplaceWith as? ElementNode, let child = element.getFirstDescendant() as? TextNode {
+                  _ = try? child.select(anchorOffset: copiedSelection.anchor.offset, focusOffset: copiedSelection.focus.offset)
+              } else if let text = writableReplaceWith as? TextNode {
+                  _ = try? text.select(anchorOffset: copiedSelection.anchor.offset, focusOffset: copiedSelection.focus.offset)
+              }
+              
+          }
     }
 
     return writableReplaceWith
