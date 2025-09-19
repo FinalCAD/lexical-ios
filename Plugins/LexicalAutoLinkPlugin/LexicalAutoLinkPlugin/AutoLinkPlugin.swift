@@ -148,11 +148,10 @@ open class AutoLinkPlugin: Plugin {
                 return
             }
             
-            
             switch match.resultType {
             case .link:
                 let label = String(text[Range(match.range, in: text)!])
-                let url =  match.url?.absoluteString ?? ""
+                let url =  match.url?.absoluteString.lowercased() ?? ""
                 linkMatcher.append(LinkMatcher(index: index, text: label, url: url, range: match.range))
             default:
                 return
@@ -254,10 +253,18 @@ open class AutoLinkPlugin: Plugin {
                 let linkNode = createAutoLinkNode(url: match.url)
                 try linkNode.append([createTextNode(text: match.text)])
                 try middleNode?.replace(replaceWith: linkNode)
+                
             }
             
             textOffset += (matchOffset + matchLength)
         }
+        
+        if textOffset > 0 {
+            let textNode = createTextNode(text: "")
+            try lastNode.getParent()?.insertAfter(nodeToInsert: textNode)
+            try textNode.select(anchorOffset: nil, focusOffset: nil)
+        }
+        
     }
     
     private func handleLinkEdit(linkNode: LinkNode) throws {
