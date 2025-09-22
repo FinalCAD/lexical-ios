@@ -29,6 +29,16 @@ open class ListPlugin: Plugin {
     do {
       try editor.registerNode(nodeType: NodeType.list, class: ListNode.self)
       try editor.registerNode(nodeType: NodeType.listItem, class: ListItemNode.self)
+        
+        _ = editor.addNodeTransform(nodeType: .listItem) { node in
+            guard let listItem = node as? ListItemNode else { return }
+            let onlyEmpty = listItem.getChildren().isEmpty
+            if onlyEmpty {
+                let placeholder = PlaceholderNode()
+                try listItem.append([placeholder])
+                try placeholder.select(anchorOffset: nil, focusOffset: nil)
+            }
+        }
 
       _ = editor.registerCommand(
         type: .insertUnorderedList,
