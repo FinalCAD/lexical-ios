@@ -164,11 +164,12 @@ open class Node: Codable {
     mutableNode.parent = latestNode.parent
     if let latestNode = latestNode as? ElementNode, let mutableNode = mutableNode as? ElementNode {
         mutableNode.format = latestNode.format
-      mutableNode.children = latestNode.children
+        mutableNode.children = latestNode.children
+        mutableNode.indent = latestNode.indent
     } else if let latestNode = latestNode as? TextNode, let mutableNode = mutableNode as? TextNode {
-      mutableNode.format = latestNode.format
+        mutableNode.format = latestNode.format
         mutableNode.style = latestNode.style
-      mutableNode.mode = latestNode.mode
+        mutableNode.mode = latestNode.mode
     }
 
     editor.cloneNotNeeded.insert(key)

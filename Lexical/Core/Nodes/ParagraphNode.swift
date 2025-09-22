@@ -40,6 +40,8 @@ public class ParagraphNode: ElementNode {
         let newElement = createParagraphNode()
         let direction = getDirection()
         do {
+            try newElement.append([PlaceholderNode()])
+            
             try newElement.setDirection(direction: direction)
             try insertAfter(nodeToInsert: newElement)
         } catch {
