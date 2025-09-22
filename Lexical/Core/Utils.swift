@@ -275,14 +275,34 @@ public func getNodeHierarchy(editorState: EditorState?) throws -> String {
       let indentation = (0..<depth).map({ _ in "\t " }).joined(separator: "")
 
       if let textNode = node as? TextNode {
+          var format: [String: String] = [:]
+          
+          
         if textNode.format.debugDescription != "" {
-          formatString = "{ format: \(textNode.format.debugDescription) }"
-        } else {
-          formatString = ""
+            format["format"] = textNode.format.debugDescription
         }
-        description.append("\(indentation)(\(node.key)) \(node.type.rawValue) \"\(textNode.getTextPart())\" \(formatString)")
+
+          var properties : [String:String] = [:]
+          
+          if let backgroundColor = textNode.style.backgroundColor {
+              properties["background-color"] = backgroundColor.rgba
+          }
+          
+          if let foregroundColor = textNode.style.foregroundColor {
+              properties["color"] = foregroundColor.rgba
+          }
+          
+          format["style"] = properties.map { "\($0):\($1)" }.joined(separator: ";")
+          let formatString: String = format.map { "\($0.key): \"\($0.value)\"" }.joined(separator: ", ")
+          
+          description.append("\(indentation)(\(node.key)) \(node.type.rawValue) \"\(textNode.getTextPart())\" {\(formatString)}")
       } else {
-        description.append("\(indentation)(\(node.key)) \(node.type.rawValue)")
+          var indent = ""
+          if let node = node as? ElementNode {
+              indent = "\(node.getIndent())"
+          }
+          
+        description.append("\(indentation)(\(node.key)) \(node.type.rawValue) {indent:\(indent)}")
       }
 
       if let elementNode = node as? ElementNode {
