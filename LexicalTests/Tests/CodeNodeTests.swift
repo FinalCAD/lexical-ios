@@ -55,7 +55,7 @@ class CodeNodeTests: XCTestCase {
         anchor: Point(key: codeNode.key, offset: 3, type: .element),
         focus: Point(key: codeNode.key, offset: 3, type: .element),
         format: TextFormat(),
-        style: ""
+        style: TextNodeStyle()
       )
     }
 
@@ -77,10 +77,10 @@ class CodeNodeTests: XCTestCase {
 
       let newNode = try codeNode.insertNewAfter(selection: selection)
       XCTAssertNotNil(newNode)
-      XCTAssertEqual(newNode?.parent, codeNode.parent)
-      XCTAssertEqual(newNode?.type, NodeType.paragraph)
-      XCTAssertNotEqual(newNode?.key, codeNode.key)
-      XCTAssertEqual(newNode, codeNode.getNextSibling())
+        XCTAssertEqual(newNode.element?.parent, codeNode.parent)
+        XCTAssertEqual(newNode.element?.type, NodeType.paragraph)
+        XCTAssertNotEqual(newNode.element?.key, codeNode.key)
+        XCTAssertEqual(newNode.element, codeNode.getNextSibling())
     }
   }
 }

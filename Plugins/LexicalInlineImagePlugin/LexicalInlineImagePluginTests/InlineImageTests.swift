@@ -45,7 +45,7 @@ class InlineImageTests: XCTestCase {
       }
       XCTAssertEqual(root.getChildrenSize(), 1, "Root should have 1 child (paragraph)")
 
-      let newSelection = RangeSelection(anchor: Point(key: textNode2.getKey(), offset: 0, type: .text), focus: Point(key: textNode2.getKey(), offset: 0, type: .text), format: TextFormat(), style: "")
+      let newSelection = RangeSelection(anchor: Point(key: textNode2.getKey(), offset: 0, type: .text), focus: Point(key: textNode2.getKey(), offset: 0, type: .text), format: TextFormat(), style: TextNodeStyle())
       try newSelection.insertParagraph()
 
       XCTAssertEqual(root.getChildrenSize(), 2, "Root should now have 2 paragraphs")

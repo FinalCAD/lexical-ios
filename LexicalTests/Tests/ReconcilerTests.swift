@@ -203,7 +203,7 @@ class ReconcilerTests: XCTestCase {
         anchor: Point(key: "2", offset: 0, type: .text),
         focus: Point(key: "2", offset: 0, type: .text),
         format: TextFormat(),
-        style: ""
+        style: TextNodeStyle()
       )
 
       try pNode.getFirstChild()?.remove()
