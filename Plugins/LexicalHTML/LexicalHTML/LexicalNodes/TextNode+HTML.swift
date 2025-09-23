@@ -79,7 +79,7 @@ extension Lexical.TextNode: NodeHTMLSupport {
                 TextNodeStyle.convertFromCSS(
                     element.getAttributes()?.get(key: "style") ?? ""
                 ),
-                shouldApply: nil
+                shouldApply: (element as? SwiftSoup.Element)?.tagName() == "b" ? .bold : nil
             ),
             node: []
         )
