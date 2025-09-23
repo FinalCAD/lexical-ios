@@ -189,10 +189,9 @@ public class ListItemNode: ElementNode {
         if isOnlyPlaceholder() {
             if listNode.getParent() is ListItemNode {
 //                try listNode.getLastChild()?.remove()
-                try self.selectPrevious(anchorOffset: nil, focusOffset: nil)
                 
                 try handleOutdent(self)
-                return .init(element: self, skipLineBreak: true, skipSelectStart: false)
+                return .init(element: self, skipLineBreak: true, skipSelectStart: true)
             } else {
                 try self.remove()
                 return .init(skipLineBreak: true)
