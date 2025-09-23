@@ -97,7 +97,7 @@ enum AttributeUtils {
 
     if let paragraphStyle = getParagraphStyle(
       attributes: combinedAttributes,
-      indentSize: CGFloat(theme.indentSize)
+      indentSize: (combinedAttributes[.paddingHead] as? CGFloat) ?? CGFloat(theme.indentSize)
     ) {
       combinedAttributes[.paragraphStyle] = paragraphStyle
       combinedAttributes[.paragraphSpacingBefore_internal] = paragraphStyle.paragraphSpacingBefore
