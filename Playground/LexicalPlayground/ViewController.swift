@@ -43,6 +43,7 @@ class ViewController: UIViewController, UIToolbarDelegate {
         
         let theme = Theme()
         theme.indentSize = 40.0
+        theme.indentCap = 2
         theme.text = [
             .lineHeight: 32.0,
             .lineSpacing: 50

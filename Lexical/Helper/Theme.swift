@@ -62,6 +62,8 @@ import Foundation
 
   /// The width in points of each indentation level.
   public var indentSize: Double = 40.0
+    /// The maximum number of indentation levels allowed. If set, indentation will not exceed this cap. Useful for limiting deeply nested content. Set to nil for no limit.
+    public var indentCap: Int? = nil
 
   /// A set of attributes applied to a custom truncation indicator (a string that is displayed when the text overflows,
   /// such as an ellipsis or "See More" or similar).
