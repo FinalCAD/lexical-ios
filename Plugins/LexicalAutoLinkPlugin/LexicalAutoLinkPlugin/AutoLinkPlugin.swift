@@ -253,17 +253,13 @@ open class AutoLinkPlugin: Plugin {
                 let linkNode = createAutoLinkNode(url: match.url)
                 try linkNode.append([createTextNode(text: match.text)])
                 try middleNode?.replace(replaceWith: linkNode)
+                try linkNode.selectEnd()
                 
             }
             
             textOffset += (matchOffset + matchLength)
         }
         
-        if textOffset > 0 {
-            let textNode = createTextNode(text: "")
-            try lastNode.getParent()?.insertAfter(nodeToInsert: textNode)
-            try textNode.select(anchorOffset: nil, focusOffset: nil)
-        }
         
     }
     
