@@ -240,6 +240,8 @@ open class AutoLinkPlugin: Plugin {
                     if nodes.count > 1 {
                         middleNode = nodes[0]
                         lastNode = nodes.count == 2 ? nodes[1] : lastNode
+                    } else if nodes.count == 1 {
+                        middleNode = nodes[0]
                     }
                 } else {
                     let nodes = try lastNode.splitText(splitOffsets: [matchOffset, matchOffset + matchLength])
