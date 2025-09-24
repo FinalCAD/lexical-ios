@@ -549,13 +549,24 @@ public class RangeSelection: BaseSelection {
             // Ensure we do splicing after moving of nodes, as splicing
             // can have side-effects (in the case of hashtags).
             if !firstNode.isToken() {
-                firstNode = try firstNode.spliceText(offset: startOffset, delCount: firstNodeTextLength - startOffset, newText: text, moveSelection: true)
-                if firstNode.getTextContent().lengthAsNSString() == 0 {
-                    try firstNode.remove()
-                } else if firstNode.isComposing() && self.anchor.type == .text {
-                    // When composing, we need to adjust the anchor offset so that
-                    // we correctly replace that right range.
-                    self.anchor.offset -= text.lengthAsNSString()
+                if firstNode.getStyle() != style || firstNode.getFormat() != format {
+                    let textNode = TextNode(text: "")
+                    try textNode.setFormat(format: format)
+                    try textNode.setStyle(style)
+                    try textNode.select(anchorOffset: 0, focusOffset: 0)
+                    try firstNode.insertAfter(nodeToInsert: textNode)
+                    try lastNode?.remove()
+                    
+                    try insertText(text)
+                } else {
+                    firstNode = try firstNode.spliceText(offset: startOffset, delCount: firstNodeTextLength - startOffset, newText: text, moveSelection: true)
+                    if firstNode.getTextContent().lengthAsNSString() == 0 {
+                        try firstNode.remove()
+                    } else if firstNode.isComposing() && self.anchor.type == .text {
+                        // When composing, we need to adjust the anchor offset so that
+                        // we correctly replace that right range.
+                        self.anchor.offset -= text.lengthAsNSString()
+                    }
                 }
             } else if startOffset == firstNodeTextLength {
                 try firstNode.select(anchorOffset: nil, focusOffset: nil)

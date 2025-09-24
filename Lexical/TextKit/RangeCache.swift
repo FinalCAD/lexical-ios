@@ -71,7 +71,7 @@ private func evaluateNode(_ nodeKey: NodeKey, stringLocation: Int, searchDirecti
   }
 
   if node is TextNode {
-    let expandedTextRange = rangeCacheItem.textRange()//.byAddingOne()
+    let expandedTextRange = rangeCacheItem.textRange().byAddingOne()
     if expandedTextRange.contains(stringLocation) {
       return RangeCacheSearchResult(nodeKey: nodeKey, type: .text, offset: stringLocation - expandedTextRange.location)
     }
