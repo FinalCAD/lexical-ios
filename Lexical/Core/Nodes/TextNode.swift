@@ -642,7 +642,7 @@ open class TextNode: Node {
                 anchorType: .text,
                 focusType: .text,
                 format: format,
-                style: style,
+                style: style
             )
         }
         guard let selection = selection as? RangeSelection else {
