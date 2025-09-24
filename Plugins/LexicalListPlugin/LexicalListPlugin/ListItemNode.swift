@@ -349,7 +349,7 @@ public class ListItemNode: ElementNode {
     attributes[.listItem] = ListItemAttribute(
       itemNodeKey: node.key,
       listItemCharacter: character,
-      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.1) * paddingHead - lineBounds.width
+      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.3) * paddingHead - lineBounds.width
     )
 
     return attributes
