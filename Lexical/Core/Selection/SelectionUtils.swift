@@ -290,7 +290,9 @@ func makeRangeSelection(
     focusKey: NodeKey,
     focusOffset: Int,
     anchorType: SelectionType,
-    focusType: SelectionType
+    focusType: SelectionType,
+    format: TextFormat,
+    style: TextNodeStyle
 ) throws -> RangeSelection {
     guard let editorState = getActiveEditorState() else {
         throw LexicalError.internal("Editor state is nil")
@@ -299,8 +301,8 @@ func makeRangeSelection(
     let selection = RangeSelection(
         anchor: Point(key: anchorKey, offset: anchorOffset, type: anchorType),
         focus: Point(key: focusKey, offset: focusOffset, type: focusType),
-        format: TextFormat(),
-        style: TextNodeStyle()
+        format: format,
+        style: style
     )
     
     selection.dirty = true

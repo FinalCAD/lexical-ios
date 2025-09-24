@@ -472,7 +472,10 @@ open class ElementNode: Node {
         focusKey: key,
         focusOffset: updatedFocusOffset,
         anchorType: .element,
-        focusType: .element)
+        focusType: .element,
+        format: TextFormat(),
+        style: TextNodeStyle()
+      )
     }
 
     selection.anchor.updatePoint(key: key, offset: updatedAnchorOffset, type: .element)

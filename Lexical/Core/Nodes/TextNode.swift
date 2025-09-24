@@ -640,12 +640,26 @@ open class TextNode: Node {
                 focusKey: key,
                 focusOffset: updatedFocusOffset,
                 anchorType: .text,
-                focusType: .text)
+                focusType: .text,
+                format: format,
+                style: style,
+            )
         }
         guard let selection = selection as? RangeSelection else {
-            return try makeRangeSelection(anchorKey: key, anchorOffset: updatedAnchorOffset, focusKey: key, focusOffset: updatedAnchorOffset, anchorType: .text, focusType: .text)
+            return try makeRangeSelection(
+                anchorKey: key,
+                anchorOffset: updatedAnchorOffset,
+                focusKey: key,
+                focusOffset: updatedAnchorOffset,
+                anchorType: .text,
+                focusType: .text,
+                format: format,
+                style: style
+            )
         }
         
+        selection.format = format
+        selection.style = style
         selection.setTextNodeRange(anchorNode: self, anchorOffset: updatedAnchorOffset, focusNode: self, focusOffset: updatedFocusOffset)
         
         return selection
