@@ -391,23 +391,17 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
     do {
       try editor.read {
           guard let root = getRoot() else { return }
-          
-          if root.getTextContentSize() == 0 {
-              shouldShow = true
-              return
-          }
+
+          shouldShow = false
           
           let paragraphNode = root.getFirstChild() as? ParagraphNode
           
           
-          if paragraphNode?.getChildrenSize() == 0 ||
-                paragraphNode?.getTextContent().isEmpty == true ||
+          if root.getChildrenSize() == 0 ||
+                root.getTextContentSize() == 0 ||
                 (paragraphNode?.getChildrenSize() == 1 && paragraphNode?.getFirstChild() is PlaceholderNode) {
               shouldShow = true
-              return
           }
-          
-          shouldShow = false
       }
       if !shouldShow {
         hidePlaceholderLabel()
