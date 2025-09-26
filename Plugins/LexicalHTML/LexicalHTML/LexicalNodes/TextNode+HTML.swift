@@ -128,8 +128,14 @@ extension Lexical.TextNode: NodeHTMLSupport {
         }
         
         let textContent = domNode.text()
-
-        return (after: nil, forChild: nil, node: [createTextNode(text: textContent)])
+        let textNode = createTextNode(text: textContent)
+        if let parent = domNode.parent() as? SwiftSoup.Element, parent.tagName() == "body" {
+            let paragraphNode = ParagraphNode()
+            try paragraphNode.append([textNode])
+            return (after: nil, forChild: nil, node: [paragraphNode])
+        }
+        
+        return (after: nil, forChild: nil, node: [textNode])
     }
     
     private static func applyTextFormatFromStyle(_ style: TextNodeStyle, shouldApply: TextFormatType?) -> DOMChildConversion {
