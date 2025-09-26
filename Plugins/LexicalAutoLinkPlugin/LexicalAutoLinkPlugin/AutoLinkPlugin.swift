@@ -270,6 +270,10 @@ open class AutoLinkPlugin: Plugin {
         let children = linkNode.getChildren()
         
         for child in children {
+            if let child = child as? TextNode, child.getTextContent() != linkNode.url {
+                return
+            }
+            
             if !(child is TextNode) {
                 try replaceWithChildren(node: linkNode)
                 return

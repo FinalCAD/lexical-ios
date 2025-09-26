@@ -609,7 +609,7 @@ public class ToolbarPlugin: NSObject, Plugin {
         
         alertController.addTextField { textField in
             textField.layer.cornerRadius = 20
-            textField.text = label
+            textField.text = label ?? url
         }
         
         alertController.addAction(doneAction)

@@ -131,6 +131,11 @@ open class LinkPlugin: Plugin {
             } else if let parent = nodes.first?.getParent() as? LinkNode {
                 // set parent to be current linkNode so that other nodes in the same parent aren't handled separately below.
                 try parent.setURL(url)
+                
+                if let textNode = parent.getFirstChild() as? TextNode {
+                    try textNode.setText(label ?? url)
+                }
+                
                 return
             }
         }
