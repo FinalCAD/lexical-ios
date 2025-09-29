@@ -311,11 +311,13 @@ public class ListItemNode: ElementNode {
     }
 
     var character = ""
+      var offset: CGFloat = 0.3
 
     if let listNode {
       switch listNode.getListType() {
       case .bullet:
         character = "\u{2022}"
+          offset = 0.7
 
       case .number:
         let start = listNode.getStart()
@@ -349,7 +351,7 @@ public class ListItemNode: ElementNode {
     attributes[.listItem] = ListItemAttribute(
       itemNodeKey: node.key,
       listItemCharacter: character,
-      characterIndentationPixels: (CGFloat(getIndent() + 1) - 0.3) * paddingHead - lineBounds.width
+      characterIndentationPixels: (CGFloat(getIndent() + 1) - offset) * paddingHead - lineBounds.width
     )
 
     return attributes
