@@ -834,11 +834,9 @@ public class Editor: NSObject {
           continue
         }
 
-        if isTextNode(node) {
           if let textNode = node as? TextNode, textNode.isSimpleText() && !textNode.isUnmergeable() {
-            try TextNode.normalizeTextNode(textNode: textNode)
+              try TextNode.normalizeTextNode(textNode: textNode)
           }
-        }
 
         for (_, transform) in transforms where node.isAttached() {
           try transform(node)

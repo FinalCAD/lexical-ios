@@ -98,6 +98,10 @@ open class Node: Codable {
   public func getTextPart() -> String {
     return ""
   }
+    
+    open func description() -> String {
+        return "(\(key)) \(type.rawValue)"
+    }
 
   // Returns the length of the text part (as UTF 16 codepoints). Note that all string lengths within Lexical work using UTF 16 codepoints, because that is what TextKit uses.
   public func getTextPartSize() -> Int {

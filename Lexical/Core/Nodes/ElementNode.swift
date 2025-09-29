@@ -359,6 +359,10 @@ open class ElementNode: Node {
   override public final func getTextPart() -> String {
     return ""
   }
+    
+    open override func description() -> String {
+        return "\(super.description()) {indent:\(indent)}"
+    }
 
   override public func getPreamble() -> String {
     if self.isInline() {

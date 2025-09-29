@@ -401,6 +401,30 @@ open class TextNode: Node {
         return key == getCompositionKey()
     }
     
+    public override func description() -> String {
+        var formatArray: [String: String] = [:]
+        
+        
+        if format.debugDescription != "" {
+            formatArray["format"] = format.debugDescription
+        }
+        
+        var properties : [String:String] = [:]
+        
+        if let backgroundColor = style.backgroundColor {
+            properties["background-color"] = backgroundColor.rgba
+        }
+        
+        if let foregroundColor = style.foregroundColor {
+            properties["color"] = foregroundColor.rgba
+        }
+        
+        formatArray["style"] = properties.map { "\($0):\($1)" }.joined(separator: ";")
+        let formatString: String = formatArray.map { "\($0.key): \"\($0.value)\"" }.joined(separator: ", ")
+        
+        return "\(super.description()) \"\(getTextPart())\" {\(formatString)}"
+    }
+    
     public func spliceText(
         offset: Int,
         delCount: Int,
