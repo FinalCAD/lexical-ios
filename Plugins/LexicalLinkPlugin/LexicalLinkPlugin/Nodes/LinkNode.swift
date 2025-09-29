@@ -53,6 +53,10 @@ open class LinkNode: ElementNode {
     try errorOnReadOnly()
     try getWritable().url = url
   }
+    
+    public override func description() -> String {
+        return "\(super.description()), url: \"\(url)\""
+    }
 
   override public func canInsertTextBefore() -> Bool {
     return false

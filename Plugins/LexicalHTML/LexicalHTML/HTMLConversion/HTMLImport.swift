@@ -64,6 +64,8 @@ func createNodeFromDOM(
         return []
     }
     
+    
+    
     var currentLexicalNode: Lexical.Node? = nil
     
     let transformFunction = try getConversionFunction(domNode: element, editor: editor)

@@ -130,12 +130,15 @@ open class LinkPlugin: Plugin {
                 return
             } else if let parent = nodes.first?.getParent() as? LinkNode {
                 // set parent to be current linkNode so that other nodes in the same parent aren't handled separately below.
-                try parent.setURL(url)
+//                try parent.setURL(url)
                 
-                if let textNode = parent.getFirstChild() as? TextNode {
-                    try textNode.setText(label ?? url)
-                }
+                let newLink = LinkNode(url: url, key: nil)
+                let node = TextNode(text: label ?? url)
+                try newLink.append([node])
                 
+                
+                try parent.replace(replaceWith: newLink)
+                try newLink.selectEnd()
                 return
             }
         }
@@ -151,12 +154,13 @@ open class LinkPlugin: Plugin {
             }
             
             if let parentNode = parent as? LinkNode {
-                linkNode = parentNode
-                try parentNode.setURL(url)
+                let newLink = LinkNode(url: url, key: nil)
+                let node = TextNode(text: label ?? url)
+                try newLink.append([node])
                 
-                if let textNode = parentNode.getFirstChild() as? TextNode {
-                   try textNode.setText(label ?? url)
-                }
+                
+                try parentNode.replace(replaceWith: newLink)
+                try newLink.selectEnd()
                 return
             }
             

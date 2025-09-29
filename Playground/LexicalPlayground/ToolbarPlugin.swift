@@ -60,7 +60,8 @@ public class ToolbarPlugin: NSObject, Plugin {
         _ = editor.registerCommand(type: .linkTapped) { [weak self] payload in
             if let self, let payload = payload as? URL, let rangeSelection = try? getSelection() as? RangeSelection, let startSearch = try? self.getSelectedNode(selection: rangeSelection) {
                 
-                guard let link = getNearestNodeOfType(node: startSearch, type: .link) else {
+                guard let link = getNearestNodeOfType(node: startSearch, type: .link) ??
+                        getNearestNodeOfType(node: startSearch, type: .autoLink) else {
                     return false
                 }
                 
@@ -75,7 +76,7 @@ public class ToolbarPlugin: NSObject, Plugin {
                     return false
                 }
                 
-                let text = try? selection.getTextContent()
+                let text = link.getTextContent()
                 
                 _ = self.showLinkActionSheet(url: payload.absoluteString, label: text ?? "", selection: selection)
                 return true
@@ -541,9 +542,9 @@ public class ToolbarPlugin: NSObject, Plugin {
                 let node = try getSelectedNode(selection: selection)
                 let text = try selection.getTextContent()
                 if let node = node as? LinkNode {
-                    _ = showLinkActionSheet(url: node.getURL(), label: text, selection: selection)
+                    _ = showLinkActionSheet(url: node.getURL(), label: node.getTextContent(), selection: selection)
                 } else if let parent = node.getParent() as? LinkNode {
-                    _ = showLinkActionSheet(url: parent.getURL(), label: text, selection: selection)
+                    _ = showLinkActionSheet(url: parent.getURL(), label: parent.getTextContent(), selection: selection)
                 } else {
                     let urlString = "https://"
                     showAlert(url: urlString, label: urlString, isEdit: false)

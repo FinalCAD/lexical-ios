@@ -24,10 +24,6 @@ struct LinkMatcher {
     var range: NSRange
 }
 
-extension NodeType {
-    public static let autoLink = NodeType(rawValue: "autoLink")
-}
-
 open class AutoLinkPlugin: Plugin {
     
     public init() {}
@@ -45,7 +41,7 @@ open class AutoLinkPlugin: Plugin {
             })
             
             _ = editor.addNodeTransform(nodeType: NodeType.autoLink, transform: { [weak self] linkNode in
-                guard let strongSelf = self, let linkNode = linkNode as? LinkNode else { return }
+                guard let strongSelf = self, let linkNode = linkNode as? AutoLinkNode else { return }
                 
                 try strongSelf.handleLinkEdit(linkNode: linkNode)
             })
@@ -61,8 +57,8 @@ open class AutoLinkPlugin: Plugin {
         node is LinkNode
     }
     
-    public func createAutoLinkNode(url: String) -> LinkNode {
-        LinkNode(url: url, key: nil)
+    public func createAutoLinkNode(url: String) -> AutoLinkNode {
+        AutoLinkNode(url: url, key: nil)
     }
     
     func isPreviousNodeValid(node: Node) -> Bool {
@@ -122,20 +118,20 @@ open class AutoLinkPlugin: Plugin {
             let parent = node.getParent()
         else { return }
         
-        if let parent = parent as? LinkNode {
+        if let parent = parent as? AutoLinkNode {
             try handleLinkEdit(linkNode: parent)
         } else if !(parent is LinkNode) {
+            try handleBadNeighbors(textNode: node)
+            
             if node.isSimpleText() {
                 try handleLinkCreation(node: node)
             }
             
-            try handleBadNeighbors(textNode: node)
+            
         }
     }
     
     private func findFirstMatch(text: String) -> [LinkMatcher] {
-//        let emailMatcher = #"^\S+@\S+\.\S+$"#
-//        let urlMatcher = "((?:http|https):\\/\\/)?(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(\\/(?<=\\/)(?:[\\w\\d\\-./_]+)?)?"
         var linkMatcher = [LinkMatcher]()
         let types: NSTextCheckingResult.CheckingType = [.link]
         let detector = try? NSDataDetector(types: types.rawValue)
@@ -159,34 +155,46 @@ open class AutoLinkPlugin: Plugin {
         }
         
         return linkMatcher
-        
-//        let splitArray = text.split(separator: " ")
-//        // find url
-//        for (index, subString) in splitArray.enumerated() {
-//            let predicate = NSPredicate(format: "SELF MATCHES %@", argumentArray: [urlMatcher])
-//            if predicate.evaluate(with: String(subString.lowercased())) {
-//                var newURLString = String(subString)
-//                if !newURLString.hasPrefix("https://") || !newURLString.hasPrefix("http://") {
-//                    newURLString = "https://" + newURLString
-//                }
-//                
-//                let newNSRange = (text as NSString).range(of: String(subString))
-//                
-//                linkMatcher.append(LinkMatcher(index: index, text: String(subString), url: newURLString, range: newNSRange))
-//            }
-//            
-//            // find email
-//            let result = subString.range(of: emailMatcher, options: [.regularExpression], range: nil, locale: nil)
-//            if result != nil {
-//                let urlString = "mailto:" + String(subString)
-//                let newNSRange = (text as NSString).range(of: String(subString))
-//                
-//                linkMatcher.append(LinkMatcher(index: index, text: String(subString), url: urlString, range: newNSRange))
-//            }
+    }
+    
+//    private func findFirstMatch(text: String) -> [LinkMatcher] {
+//        var linkMatchers = [LinkMatcher]()
+//        // Votre expression régulière
+//        let pattern = "((https?:\\/\\/(www\\.)?)|(www\\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)"
+//        
+//        // On utilise NSRegularExpression pour la recherche avec un pattern personnalisé
+//        guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive]) else {
+//            return []
 //        }
 //        
-//        return linkMatcher
-    }
+//        let range = NSRange(text.startIndex..<text.endIndex, in: text)
+//        let matches = regex.matches(in: text, options: [], range: range)
+//        
+//        // On boucle sur tous les résultats trouvés
+//        for (index, match) in matches.enumerated() {
+//            // On s'assure que la range est valide pour extraire le texte
+//            guard let matchRange = Range(match.range, in: text) else { continue }
+//            
+//            let label = String(text[matchRange])
+//            
+//            // On s'assure que l'URL est valide (en ajoutant "https://" si nécessaire)
+//            var urlString = label
+//            if urlString.lowercased().hasPrefix("www.") {
+//                urlString = "https://\(urlString)"
+//            }
+//            
+//            linkMatchers.append(
+//                LinkMatcher(
+//                    index: index,
+//                    text: label,
+//                    url: urlString.lowercased(),
+//                    range: match.range
+//                )
+//            )
+//        }
+//        
+//        return linkMatchers
+//    }
     
     private func handleLinkCreation(node: TextNode) throws {
         let nodeText = node.getTextContent()
@@ -270,10 +278,6 @@ open class AutoLinkPlugin: Plugin {
         let children = linkNode.getChildren()
         
         for child in children {
-            if let child = child as? TextNode, child.getTextContent() != linkNode.url {
-                return
-            }
-            
             if !(child is TextNode) {
                 try replaceWithChildren(node: linkNode)
                 return
@@ -289,16 +293,18 @@ open class AutoLinkPlugin: Plugin {
         let text = linkNode.getTextContent()
         let matches = findFirstMatch(text: text)
         
-        if matches.count == 0 || (matches.count >= 1 && matches[0].text != text) {
+        if matches.count == 0 {
             try replaceWithChildren(node: linkNode)
+            return
+        } else if matches.count > 1 && matches[0].text != text {
             return
         }
         
-        // Check neighbors
-        if !isPreviousNodeValid(node: linkNode) || !isNextNodeValid(node: linkNode) {
-            try replaceWithChildren(node: linkNode)
-            return
-        }
+//        // Check neighbors
+//        if !isPreviousNodeValid(node: linkNode) || !isNextNodeValid(node: linkNode) {
+//            try replaceWithChildren(node: linkNode)
+//            return
+//        }
         
         let url = linkNode.getURL()
         
@@ -313,19 +319,45 @@ open class AutoLinkPlugin: Plugin {
         let previousSibling = textNode.getPreviousSibling()
         let nextSibling = textNode.getNextSibling()
         let text = textNode.getTextContent()
+        var newTextNode = textNode
         
         let startChar = String(text[text.startIndex])
         if let previousSibling = previousSibling as? LinkNode, startChar != " " {
-            try previousSibling.append([textNode])
-            try handleLinkEdit(linkNode: previousSibling)
+            
+            if let index = text.firstIndex(of: " ") {
+                let distance = text.distance(from: text.startIndex, to: index)
+                let textNodes = try textNode.splitText(splitOffsets: [distance])
+                
+                if textNodes.count > 1 {
+                    newTextNode = textNodes.first!
+                }
+            }
+            
+            try previousSibling.append([newTextNode])
+            if previousSibling is AutoLinkNode {
+                try handleLinkEdit(linkNode: previousSibling)
+            }
 //            try replaceWithChildren(node: previousSibling)
         }
         
         let endIndex = text.index(before: text.endIndex)
         let lastChar = String(text[endIndex])
         if let nextSibling = nextSibling as? LinkNode, lastChar != " " {
-            try replaceWithChildren(node: nextSibling)
-            try handleLinkEdit(linkNode: nextSibling)
+            if let index = text.lastIndex(of: " ") {
+                let distance = text.distance(from: index, to: text.endIndex)
+                let textNodes = try textNode.splitText(splitOffsets: [distance])
+                
+                if textNodes.count > 1 {
+                    newTextNode = textNodes.last!
+                }
+            }
+            
+            try nextSibling.getFirstChild()?.insertBefore(nodeToInsert: newTextNode)
+//            try replaceWithChildren(node: nextSibling)
+            if nextSibling is AutoLinkNode {
+                try handleLinkEdit(linkNode: nextSibling)
+            }
         }
     }
 }
+
