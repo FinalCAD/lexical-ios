@@ -30,6 +30,12 @@ open class ListPlugin: Plugin {
       try editor.registerNode(nodeType: NodeType.list, class: ListNode.self)
       try editor.registerNode(nodeType: NodeType.listItem, class: ListItemNode.self)
         
+        _ = editor.addNodeTransform(nodeType: NodeType.list) { node in
+            if let list = node as? ListNode, list.getChildren().count == 0 {
+                try list.remove()
+            }
+        }
+        
         _ = editor.addNodeTransform(nodeType: .listItem) { node in
             guard let listItem = node as? ListItemNode else { return }
             let onlyEmpty = listItem.getChildren().isEmpty
