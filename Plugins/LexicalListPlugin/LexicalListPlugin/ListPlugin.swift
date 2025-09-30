@@ -32,7 +32,7 @@ open class ListPlugin: Plugin {
         
         _ = editor.addNodeTransform(nodeType: NodeType.list) { node in
             if let list = node as? ListNode, list.getChildren().count == 0 {
-                try list.remove()
+                try list.replace(replaceWith: createParagraphNode())
             }
         }
         
