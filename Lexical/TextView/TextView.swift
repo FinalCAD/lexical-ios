@@ -431,6 +431,8 @@ protocol LexicalTextViewDelegate: NSObjectProtocol {
   }
 
   override public func becomeFirstResponder() -> Bool {
+      guard isEditable else { return false }
+      
     let r = super.becomeFirstResponder()
     if r == true {
       onSelectionChange(editor: editor)
