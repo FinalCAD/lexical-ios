@@ -22,12 +22,22 @@ extension Lexical.HeadingNode: NodeHTMLSupport {
         ]
     }
     
-    private static func convertHeadingElement(_ element: SwiftSoup.Node) -> DOMConversionOutput {
-        var node: Lexical.Node? = nil
+    private static func convertHeadingElement(_ element: SwiftSoup.Node) throws -> DOMConversionOutput {
+        var node: Lexical.ElementNode? = nil
         if let tagName = (element as? SwiftSoup.Element)?.tagName() {
             if let headingTag = HeadingTagType(rawValue: tagName) {
                 node = createHeadingNode(headingTag: headingTag)
                 
+            }
+        }
+        
+        if let style = element.getAttributes()?.styles() {
+            let indent = (style.paddingInlineState ?? 0) / 40
+            
+            try node?.setIndent(indent)
+            
+            if let textAlign = style.textAlign?.rawValue {
+                try node?.setFormat(ElementFormatType(rawValue: textAlign) ?? .left)
             }
         }
         
@@ -39,6 +49,23 @@ extension Lexical.HeadingNode: NodeHTMLSupport {
     public func exportDOM(editor: Lexical.Editor) throws -> DOMExportOutput {
         let tag = self.getTag().rawValue
         let dom = SwiftSoup.Element(Tag(tag), "")
+        
+        var style: [String] = []
+        
+        if getIndent() > 0 {
+            style.append("padding-inline-start:\(getIndent() * 40)px")
+            
+        }
+        
+        let format = getFormat()
+        if format != .left {
+            style.append("text-align:\(format.rawValue)")
+        }
+        
+        if style.isEmpty == false {
+            try dom.attr("style", style.joined(separator: ";"))
+        }
+        
         return (after: nil, element: dom)
     }
 }
