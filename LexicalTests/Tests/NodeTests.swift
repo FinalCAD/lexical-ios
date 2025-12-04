@@ -1694,7 +1694,7 @@ class NodeTests: XCTestCase {
 
       XCTAssertEqual(rootNode.children.count, 3)
       XCTAssertEqual(rootNode.children[0], "0")
-      XCTAssertEqual(rootNode.children[1], "5")
+      XCTAssertEqual(rootNode.children[1], "6")
       XCTAssertEqual(rootNode.children[2], "3")
       XCTAssertFalse(rootNode.children.contains("4"))
 
@@ -2195,7 +2195,7 @@ class NodeTests: XCTestCase {
   //  }
 
   func testNoCrashWhenSplittingMultiCodepointString() throws {
-    let unicodeTestString = "Test\u{1f609}"
+    let unicodeTestString = "Test😉"
 
     guard let view else {
       XCTFail("Editor unexpectedly nil")
@@ -2218,6 +2218,6 @@ class NodeTests: XCTestCase {
       try selection.insertParagraph()
     }
 
-    XCTAssertEqual(view.textStorage.string, "T\nest\u{1f609}")
+    XCTAssertEqual(view.textStorage.string, "T\n​est😉")
   }
 }

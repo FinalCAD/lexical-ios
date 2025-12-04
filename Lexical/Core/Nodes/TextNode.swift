@@ -296,7 +296,7 @@ open class TextNode: Node {
         self.format = SerializedTextFormat.convertToTextFormat(from: serializedFormat)
         let serializedDetail = try container.decode(SerializedTextNodeDetail.self, forKey: .detail)
         self.detail = SerializedTextNodeDetail.convertToTextDetail(from: serializedDetail)
-        self.style = try container.decode(TextNodeStyle.self, forKey: .style)
+        self.style = (try? container.decode(TextNodeStyle.self, forKey: .style)) ?? .init()
     }
     
     override open func encode(to encoder: Encoder) throws {

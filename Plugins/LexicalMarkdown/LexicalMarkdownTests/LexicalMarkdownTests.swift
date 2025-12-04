@@ -45,7 +45,7 @@ class LexicalMarkdownTests: XCTestCase {
       }
 
       // Root level
-      let list = ListNode(listType: .bullet, start: 1)
+      let list = ListNode(listType: .bullet, start: 1, withPlaceholders: true)
 
       let item1 = ListItemNode()
       try item1.append([TextNode(text: "Item 1")])

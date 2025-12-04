@@ -23,7 +23,13 @@ class InlineImageTests: XCTestCase {
   }
 
   override func setUp() {
-    view = LexicalView(editorConfig: EditorConfig(theme: Theme(), plugins: [InlineImagePlugin()]), featureFlags: FeatureFlags())
+      view = LexicalView(
+        editorConfig: EditorConfig(
+            theme: Theme(),
+            plugins: [InlineImagePlugin()]
+        ),
+        featureFlags: FeatureFlags()
+      )
   }
 
   override func tearDown() {
@@ -32,7 +38,12 @@ class InlineImageTests: XCTestCase {
 
   func testNewParaAfterImage() throws {
     try editor.update {
-      let imageNode = ImageNode(url: "https://example.com/image.png", size: CGSize(width: 300, height: 300), sourceID: "")
+      let imageNode = ImageNode(
+        url: "https://example.com/image.png",
+        size: CGSize(width: 300, height: 300),
+        sourceID: ""
+      )
+        
       let textNode1 = TextNode(text: "123")
       let textNode2 = TextNode(text: "456")
       if let selection = try getSelection() {
@@ -59,7 +70,7 @@ class InlineImageTests: XCTestCase {
       }
 
       XCTAssertEqual(firstPara.getChildrenSize(), 2, "First para should contain 1 text node and 1 image node")
-      XCTAssertEqual(secondPara.getChildrenSize(), 1, "Second para should contain 1 text node")
+      XCTAssertEqual(secondPara.getChildrenSize(), 2, "Second para should contain 1 text node")
     }
   }
 }

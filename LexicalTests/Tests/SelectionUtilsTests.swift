@@ -505,7 +505,10 @@ class SelectionUtilsTests: XCTestCase {
         focusKey: "1",
         focusOffset: 5,
         anchorType: .text,
-        focusType: .text)
+        focusType: .text,
+        format: .init(),
+        style: .init()
+      )
 
       guard let selection = editor.testing_getPendingEditorState()?.selection as? RangeSelection else {
         XCTFail("Expected range selection")
@@ -537,7 +540,10 @@ class SelectionUtilsTests: XCTestCase {
         focusKey: "1",
         focusOffset: 5,
         anchorType: .text,
-        focusType: .text)
+        focusType: .text,
+        format: .init(),
+        style: .init()
+      )
 
       editor.getEditorState().selection = newSelection
     }
@@ -549,7 +555,9 @@ class SelectionUtilsTests: XCTestCase {
         focusKey: "1",
         focusOffset: 5,
         anchorType: .text,
-        focusType: .text
+        focusType: .text,
+        format: .init(),
+        style: .init()
       )
 
       XCTAssertTrue(editor.getEditorState().selection?.isSelection(newSelection2) ?? false)

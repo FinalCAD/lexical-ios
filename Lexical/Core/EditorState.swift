@@ -116,7 +116,10 @@ public class EditorState: NSObject {
         throw LexicalError.invariantViolation("Could not get RootNode")
       }
       let persistedEditorState = SerializedEditorState(rootNode: rootNode)
-      let encodedData = try JSONEncoder().encode(persistedEditorState)
+        let jsonEncoder = JSONEncoder()
+        jsonEncoder.outputFormatting = [.prettyPrinted]
+      let encodedData = try jsonEncoder.encode(persistedEditorState)
+        
       guard let jsonString = String(data: encodedData, encoding: .utf8) else { return "" }
       return jsonString
     }

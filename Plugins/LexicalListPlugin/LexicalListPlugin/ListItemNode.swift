@@ -200,17 +200,17 @@ public class ListItemNode: ElementNode {
         }
         
         let newElement = ListItemNode()
-        if listNode.withPlaceholders {
-            let placeholder = PlaceholderNode()
-            try newElement.append([placeholder])
-            try placeholder.select(anchorOffset: nil, focusOffset: nil)
-        } else {
-            try newElement.select(anchorOffset: nil, focusOffset: nil)
+        
+        
+        guard let listItemNode = try self.insertAfter(nodeToInsert: newElement) as? ListItemNode else {
+            return .init(element: nil, skipSelectStart: true)
         }
-        
-        _ = try self.insertAfter(nodeToInsert: newElement)
-        
-        return .init(element: newElement, skipSelectStart: true)
+//        , insertedElement.isEmpty() && listNode.withPlaceholders {
+////            let placeholder = PlaceholderNode()
+////            try insertedElement.append([placeholder])
+//        }
+//        try listItemNode.select(anchorOffset: nil, focusOffset: nil)
+        return .init(element: listItemNode, skipSelectStart: false)
     }
 
   override public func collapseAtStart(selection: RangeSelection) throws -> Bool {

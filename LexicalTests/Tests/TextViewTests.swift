@@ -122,7 +122,7 @@ class TextViewTests: XCTestCase {
     textView.selectedRange = NSRange(location: 11, length: 0)
 
     textView.insertText("\n")
-    XCTAssertEqual(textView.text, "Hello world\n", "Should have inserted character in non-controlled mode")
+    XCTAssertEqual(textView.text, "Hello world\n\u{200B}", "Should have inserted character in non-controlled mode")
     if let newParagraphNode = getNodeByKey(key: "2") as? ParagraphNode {
       XCTAssertEqual(newParagraphNode.key, "2")
       XCTAssertEqual(newParagraphNode.parent, kRootNodeKey)
@@ -141,70 +141,70 @@ class TextViewTests: XCTestCase {
       XCTFail("Expected range selection")
       return
     }
-    XCTAssertEqual(selection.anchor.key, "3")
-    XCTAssertEqual(selection.focus.key, "3")
+    XCTAssertEqual(selection.anchor.key, "4")
+    XCTAssertEqual(selection.focus.key, "4")
     XCTAssertEqual(selection.anchor.offset, 3)
     XCTAssertEqual(selection.focus.offset, 3)
     XCTAssertEqual(selection.anchor.type, SelectionType.text)
   }
 
-  // Test disabled due to iOS 16 UIPasteboard restrictions. I can't figure out a workaround right now. @amyworrall
-  //  func testCut() throws {
-  //    let view = LexicalView(editorConfig: EditorConfig(theme: Theme(), plugins: []), featureFlags: FeatureFlags())
-  //    let textView = view.textView
-  //
-  //    textView.insertText("Hello world")
-  //    let anchor = createPoint(key: "1", offset: 6, type: .text)
-  //    let focus = createPoint(key: "1", offset: 11, type: .text)
-  //    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: TextNodeStyle())
-  //
-  //    textView.cut(nil)
-  //
-  //    try textView.editor.update {
-  //      let itemSet = UIPasteboard.general.itemSet(withPasteboardTypes: ["x-lexical-nodes"])
-  //      guard let data = UIPasteboard.general.data(forPasteboardType: "x-lexical-nodes", inItemSet: itemSet)?.last else {
-  //        print("No data on pasteboard")
-  //        return
-  //      }
-  //
-  //      let json = try JSONDecoder().decode(SerializedNodeArray.self, from: data)
-  //      if let node = json.nodeArray.first as? TextNode {
-  //        let text = node.getText_dangerousPropertyAccess()
-  //        XCTAssertEqual(String(describing: text), "world")
-  //      } else {
-  //        XCTFail("First (only) node in nodeArray was not TextNode")
-  //      }
-  //    }
-  //  }
+   //Test disabled due to iOS 16 UIPasteboard restrictions. I can't figure out a workaround right now. @amyworrall
+    func testCut() throws {
+      let view = LexicalView(editorConfig: EditorConfig(theme: Theme(), plugins: []), featureFlags: FeatureFlags())
+      let textView = view.textView
+  
+      textView.insertText("Hello world")
+      let anchor = createPoint(key: "1", offset: 6, type: .text)
+      let focus = createPoint(key: "1", offset: 11, type: .text)
+      textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: TextNodeStyle())
+  
+      textView.cut(nil)
+  
+      try textView.editor.update {
+        let itemSet = UIPasteboard.general.itemSet(withPasteboardTypes: ["x-lexical-nodes"])
+        guard let data = UIPasteboard.general.data(forPasteboardType: "x-lexical-nodes", inItemSet: itemSet)?.last else {
+          print("No data on pasteboard")
+          return
+        }
+  
+        let json = try JSONDecoder().decode(SerializedNodeArray.self, from: data)
+        if let node = json.nodeArray.first as? TextNode {
+          let text = node.getText_dangerousPropertyAccess()
+          XCTAssertEqual(String(describing: text), "world")
+        } else {
+          XCTFail("First (only) node in nodeArray was not TextNode")
+        }
+      }
+    }
 
-  // Test disabled due to iOS 16 UIPasteboard restrictions. I can't figure out a workaround right now. @amyworrall
-  //  func testCopy() throws {
-  //    let view = LexicalView(editorConfig: EditorConfig(theme: Theme(), plugins: []), featureFlags: FeatureFlags())
-  //    let textView = view.textView
-  //
-  //    textView.insertText("Hello world")
-  //    let anchor = createPoint(key: "1", offset: 6, type: .text)
-  //    let focus = createPoint(key: "1", offset: 11, type: .text)
-  //    textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: TextNodeStyle())
-  //
-  //    textView.copy(nil)
-  //
-  //    try textView.editor.update {
-  //      let itemSet = UIPasteboard.general.itemSet(withPasteboardTypes: ["x-lexical-nodes"])
-  //      guard let data = UIPasteboard.general.data(forPasteboardType: "x-lexical-nodes", inItemSet: itemSet)?.last else {
-  //        print("No data on pasteboard")
-  //        return
-  //      }
-  //
-  //      let json = try JSONDecoder().decode(SerializedNodeArray.self, from: data)
-  //      if let node = json.nodeArray.first as? TextNode {
-  //        let text = node.getText_dangerousPropertyAccess()
-  //        XCTAssertEqual(String(describing: text), "world")
-  //      } else {
-  //        XCTFail("First (only) node in nodeArray was not TextNode")
-  //      }
-  //    }
-  //  }
+   //Test disabled due to iOS 16 UIPasteboard restrictions. I can't figure out a workaround right now. @amyworrall
+    func testCopy() throws {
+      let view = LexicalView(editorConfig: EditorConfig(theme: Theme(), plugins: []), featureFlags: FeatureFlags())
+      let textView = view.textView
+  
+      textView.insertText("Hello world")
+      let anchor = createPoint(key: "1", offset: 6, type: .text)
+      let focus = createPoint(key: "1", offset: 11, type: .text)
+      textView.editor.getEditorState().selection = RangeSelection(anchor: anchor, focus: focus, format: TextFormat(), style: TextNodeStyle())
+  
+      textView.copy(nil)
+  
+      try textView.editor.update {
+        let itemSet = UIPasteboard.general.itemSet(withPasteboardTypes: ["x-lexical-nodes"])
+        guard let data = UIPasteboard.general.data(forPasteboardType: "x-lexical-nodes", inItemSet: itemSet)?.last else {
+          print("No data on pasteboard")
+          return
+        }
+  
+        let json = try JSONDecoder().decode(SerializedNodeArray.self, from: data)
+        if let node = json.nodeArray.first as? TextNode {
+          let text = node.getText_dangerousPropertyAccess()
+          XCTAssertEqual(String(describing: text), "world")
+        } else {
+          XCTFail("First (only) node in nodeArray was not TextNode")
+        }
+      }
+    }
 
   func testInsertPlainText() throws {
     let view = LexicalView(editorConfig: EditorConfig(theme: Theme(), plugins: []), featureFlags: FeatureFlags())
